@@ -37,7 +37,7 @@ cmd_list = []
 depart = (50,50)
 
 # Lecture du fichier et remplissage de la liste des commandes
-with open("commandes.txt","r") as file:
+with open("Simulation/commandes.txt","r") as file:
     for ligne in file:
         ligne = ligne.strip()
         print(ligne)
