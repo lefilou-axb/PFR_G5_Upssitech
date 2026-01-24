@@ -1,0 +1,34 @@
+WELCOME=Bienvenue dans l'interface utilisateur du robot
+TITLE_HOME=\n==================== ECRAN D'ACCUEIL ====================
+TITLE_USER=\n==================== MENU UTILISATEUR ====================
+TITLE_PILOTING=\n==================== PILOTAGE ====================
+TITLE_MANUAL=\n==================== PILOTAGE MANUEL ====================
+TITLE_VOICE=\n==================== PILOTAGE VOCAL ====================
+TITLE_TEXTUAL=\n==================== PILOTAGE TEXTUEL ====================
+TITLE_IMAGE=\n==================== TRAITEMENT D'IMAGE ====================
+TITLE_LOGIN=\n==================== CONNEXION ADMINISTRATEUR ====================
+TITLE_ADMIN=\n==================== MENU ADMINISTRATEUR ====================
+MENU_MAIN=1.Utilisateur\n2.Administrateur\n3.Quitter
+USER_MENU=1.Pilotage du robot\n2.Traitement d'image\n3.Retour
+PILOT_MENU=1.Mode manuel\n2.Mode vocal\n3.Mode textuel\n4.Retour
+ENV_CHOICE= Veuillez choisir le numero de l'environnement :
+MANUAL_MSG=Mode manuel selectionne\nLe pilotage du robot se fera a l'aide des fleches directionnelles\n
+VOCAL_MSG=Mode vocal selectionne\nLes instructions vocales reconnues seront affichees ici\n
+TEXT_MSG=Mode textuel selectionne\nPour sortir de ce mode saisissez 1\nVeuillez saisir une instruction :
+TEXT_ECHO=Instruction saisie
+IMAGE_MENU=Lancement du programme de traitement d'image...\n
+IMAGE_END=Fin du traitement des images
+EXIT_MSG=Fermeture de l'interface...
+LOGIN_ID=Identifiant :
+LOGIN_PWD=Mot de passe :
+LOGIN_FAIL=Identifiant ou mot de passe incorrect
+LANG_ERROR=Erreur : fichier de langue introuvable
+LOGIN_LOCKED=Nombre maximum de tentatives atteint
+LOGIN_COUNTDOWN=Nouvelle tentative possible dans
+SECONDS=secondes
+ADMIN_MENU=1.Configuration traitement d'image\n2.Configuration des requêtes\n3.Retour
+INPUT_ERROR=Erreur : veuillez saisir uniquement un nombre valide
+REQUEST_MSG=Veuillez entrer une commande texte (1 pour quitter) :
+REQUEST_CMD=Commandes générées :
+REQUEST_EXP=Commandes exportées dans commands.txt
+CONFIG_CHG=Langue chargée : Français

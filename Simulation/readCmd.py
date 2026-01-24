@@ -37,12 +37,12 @@ cmd_list = []
 depart = (50,50)
 
 # Lecture du fichier et remplissage de la liste des commandes
-with open("commands.txt","r") as file:
+with open("../IHM/commands.txt","r") as file:
     for ligne in file:
         ligne = ligne.strip()
-        print(ligne)
+        #print(ligne)
         cmd_list.append(ligne)
-print(cmd_list)
+#print(cmd_list)
 
 table.tracerPiece(piece2)
 

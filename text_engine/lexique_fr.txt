@@ -1,0 +1,125 @@
+# =========================
+# Actions
+# =========================
+avance;0;forward
+avancer;0;forward
+avances;0;forward
+avancez;0;forward
+continue;0;forward
+continuer;0;forward
+
+recule;0;backward
+reculer;0;backward
+recules;0;backward
+reculez;0;backward
+
+tourne;0;turn
+tourner;0;turn
+tournes;0;turn
+tournez;0;turn
+
+aller;0;goto
+allez;0;goto
+va;0;goto
+vas;0;goto
+
+
+# =========================
+# Directions
+# =========================
+gauche;1;LEFT
+droite;1;RIGHT
+a_gauche;1;LEFT
+a_droite;1;RIGHT
+
+# =========================
+# Nombres écrits
+# =========================
+un;2;1
+deux;2;2
+trois;2;3
+quatre;2;4
+cinq;2;5
+six;2;6
+sept;2;7
+huit;2;8
+neuf;2;9
+dix;2;10
+
+# =========================
+# Unités de distance
+# =========================
+m;3;m
+metre;3;m
+metres;3;m
+mètre;3;m
+mètres;3;m
+
+cm;3;cm
+centimetre;3;cm
+centimetres;3;cm
+centimètre;3;cm
+centimètres;3;cm
+
+# =========================
+# Unités d'angle
+# =========================
+degre;3;deg
+degres;3;deg
+degré;3;deg
+degrés;3;deg
+
+# =========================
+# Objets
+# =========================
+balle;4;BALL
+cube;4;CUBE
+
+# =========================
+# Couleurs
+# =========================
+rouge;5;RED
+bleu;5;BLUE
+bleue;5;BLUE
+jaune;5;YELLOW
+vert;5;GREEN
+verte;5;GREEN
+
+# =========================
+# Liens / mots grammaticaux
+# =========================
+et;6;AND
+puis;6;AND
+mais;6;AND
+a;6;AND
+au;6;AND
+vers;6;AND
+jusqua;6;AND
+jusquà;6;AND
+autour;6;AND
+de;6;AND
+
+# =========================
+# Actions spéciales (mouvements complexes)
+# =========================
+zigzag;7;ZIGZAG
+cercle;7;CIRCLE
+
+# =========================
+# Actions spéciales simples
+# =========================
+demi-tour;7;U_TURN
+demi_tour;7;U_TURN
+retourne-toi;7;U_TURN
+retourne;7;U_TURN
+reviens;7;COME_BACK
+
+# =========================
+# Négation
+# =========================
+ne;8;NOT
+pas;8;NOT
+jamais;8;NOT
+plus;8;NOT
+aucun;8;NOT
+rien;8;NOT
