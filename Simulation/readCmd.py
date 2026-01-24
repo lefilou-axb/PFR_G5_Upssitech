@@ -37,7 +37,7 @@ cmd_list = []
 depart = (50,50)
 
 # Lecture du fichier et remplissage de la liste des commandes
-with open("Simulation/commandes.txt","r") as file:
+with open("commands.txt","r") as file:
     for ligne in file:
         ligne = ligne.strip()
         print(ligne)
@@ -48,7 +48,9 @@ table.tracerPiece(piece2)
 
 # Déplacement du robot
 t.goto(depart)
-t.down
+t.width(2)
+t.color('red')
+t.down()
 t.speed(1)
 for i in range(len(cmd_list)):
     valeur = 0
@@ -62,14 +64,29 @@ for i in range(len(cmd_list)):
         valeur = float(instruction[1])
     except :
         print(f"Pas de valeur pour la commande : {commande}")
- 
+    
     if(commande == "forward"):
         t.forward(valeur)
-    if((commande == "turn") or (commande == "left")):
-        t.left(90)
-    if(commande == "right"):
-        t.right(90)
-        
     
+    if((commande == "turn") or (commande == "left")):
+        if(valeur > 0):
+            t.left(valeur)
+        else :
+            t.left(90)
+
+    if(commande == "right"):
+        if(valeur > 0):
+            t.right(valeur)
+        else :
+            t.right(90)
+
+    if(commande == "backward"):
+        t.backward(valeur)
+    
+    if(commande == "goto"):
+        t.goto(valeur)
+    
+t.up()
+t.done()
 
 
