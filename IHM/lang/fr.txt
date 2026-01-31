@@ -8,27 +8,39 @@ TITLE_TEXTUAL=\n==================== PILOTAGE TEXTUEL ====================
 TITLE_IMAGE=\n==================== TRAITEMENT D'IMAGE ====================
 TITLE_LOGIN=\n==================== CONNEXION ADMINISTRATEUR ====================
 TITLE_ADMIN=\n==================== MENU ADMINISTRATEUR ====================
+TITLE_CONFIG_IMG=\n==================== CONFIGURATION TRAITEMENT D'IMAGE ====================
 MENU_MAIN=1.Utilisateur\n2.Administrateur\n3.Quitter
 USER_MENU=1.Pilotage du robot\n2.Traitement d'image\n3.Retour
-PILOT_MENU=1.Mode manuel\n2.Mode vocal\n3.Mode textuel\n4.Retour
+PILOT_MENU=1.Mode vocal\n2.Mode textuel\n3.Retour
 ENV_CHOICE= Veuillez choisir le numero de l'environnement :
+ENV_SELECT= Environnement selectionne :
 MANUAL_MSG=Mode manuel selectionne\nLe pilotage du robot se fera a l'aide des fleches directionnelles\n
 VOCAL_MSG=Mode vocal selectionne\nLes instructions vocales reconnues seront affichees ici\n
 TEXT_MSG=Mode textuel selectionne\nPour sortir de ce mode saisissez 1\nVeuillez saisir une instruction :
 TEXT_ECHO=Instruction saisie
 IMAGE_MENU=Lancement du programme de traitement d'image...\n
-IMAGE_END=Fin du traitement des images
+IMAGE_END=Fin du traitement des images.
 EXIT_MSG=Fermeture de l'interface...
 LOGIN_ID=Identifiant :
 LOGIN_PWD=Mot de passe :
-LOGIN_FAIL=Identifiant ou mot de passe incorrect
-LANG_ERROR=Erreur : fichier de langue introuvable
+LOGIN_FAIL=Identifiant ou mot de passe incorrect.
+LANG_ERROR=Erreur : fichier de langue introuvable.
 LOGIN_LOCKED=Nombre maximum de tentatives atteint
 LOGIN_COUNTDOWN=Nouvelle tentative possible dans
 SECONDS=secondes
-ADMIN_MENU=1.Configuration traitement d'image\n2.Configuration des requêtes\n3.Retour
-INPUT_ERROR=Erreur : veuillez saisir uniquement un nombre valide
+ADMIN_MENU=1.Configuration traitement d'image\n2.Retour
+INPUT_ERROR=Erreur : veuillez saisir uniquement un nombre valide.
 REQUEST_MSG=Veuillez entrer une commande texte (1 pour quitter) :
 REQUEST_CMD=Commandes générées :
-REQUEST_EXP=Commandes exportées dans commands.txt
+REQUEST_EXP=Commandes exportées dans commands.txt.
 CONFIG_CHG=Langue chargée : Français
+CONFIG_MENU=1.Modifier la valeur\n2.Retour
+READ_ERROR=Erreur lecture configuration
+WRITE_ERROR=Erreur de saisie
+CONFIG_OUT_OF_RANGE=Valeur hors plage
+CONFIG_WRITE_ERROR=Erreur d'écriture de la configuration
+CONFIG_UPDATE_SUCCESS=Configuration mise à jour avec succès
+NEW_VALUE=Nouvelle valeur modifiee :
+CONFIG_ACT=Configuration actuelle :
+CONFIG_VALUE_RETRIEVED=Valeur de la quantification :
+CMD_ERROR=Commande saisie non reconnue par le système

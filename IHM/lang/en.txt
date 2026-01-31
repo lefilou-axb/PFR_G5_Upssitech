@@ -8,27 +8,39 @@ TITLE_TEXTUAL=\n==================== TEXTUAL CONTROL ====================
 TITLE_IMAGE=\n==================== IMAGE PROCESSING ====================
 TITLE_LOGIN=\n==================== ADMINISTRATOR LOGIN ====================
 TITLE_ADMIN=\n==================== ADMINISTRATOR MENU ====================
+TITLE_CONFIG_IMG=\n==================== IMAGE PROCESSING CONFIGURATION ====================
 MENU_MAIN=1.User\n2.Administrator\n3.Quit
 USER_MENU=1.Robot control\n2.Image processing\n3.Back
-PILOT_MENU=1.Manual mode\n2.Voice mode\n3.Text mode\n4.Back
+PILOT_MENU=1.Voice mode\n2.Text mode\n3.Back
 ENV_CHOICE=Please choose the environment number :
+ENV_SELECT=Selected environment :
 MANUAL_MSG=Manual mode selected\nRobot control will be done using arrow keys\n
 VOCAL_MSG=Voice mode selected\nRecognized voice commands will be displayed here\n
 TEXT_MSG=Text mode selected\nTo exit this mode press 1\nPlease enter an instruction :
 TEXT_ECHO=Entered instruction
 IMAGE_MENU=Launching the image processing program...\n
-IMAGE_END=Image processing complete
+IMAGE_END=Image processing complete.
 EXIT_MSG=Closing the interface...
-LOGIN_ID=Username:
-LOGIN_PWD=Password:
-LOGIN_FAIL=Invalid username or password
-LANG_ERROR=Error: language file not found
+LOGIN_ID=Username :
+LOGIN_PWD=Password :
+LOGIN_FAIL=Invalid username or password.
+LANG_ERROR=Error : language file not found.
 LOGIN_LOCKED=Maximum number of attempts reached
 LOGIN_COUNTDOWN=New attempt possible in
 SECONDS=seconds
-ADMIN_MENU=1.Image processing configuration\n2.Query configuration\n3.Back
-INPUT_ERROR=Error: please enter numbers only.
+ADMIN_MENU=1.Image processing configuration\n2.Back
+INPUT_ERROR=Error : please enter numbers only.
 REQUEST_MSG=Please enter a text command (1 to quit):
 REQUEST_CMD=Commands generated :
-REQUEST_EXP=Commands exported to commands.txt
-CONFIG_CHG=Loaded language: English
+REQUEST_EXP=Commands exported to commands.txt.
+CONFIG_CHG=Loaded language : English
+CONFIG_MENU=1.Change the value\n2.Back
+READ_ERROR=Configuration reading error
+WRITE_ERROR=Input error
+CONFIG_OUT_OF_RANGE=Value out of range
+CONFIG_WRITE_ERROR=Configuration write error
+CONFIG_UPDATE_SUCCESS=Configuration successfully updated
+NEW_VALUE=New value modified :
+CONFIG_ACT=Current configuration :
+CONFIG_VALUE_RETRIEVED=Value of quantification :
+CMD_ERROR=Entered command not recognized by the system

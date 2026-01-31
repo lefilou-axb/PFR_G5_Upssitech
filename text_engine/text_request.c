@@ -9,7 +9,7 @@
  * Exporte les commandes pour la simulation
  * Format : action,valeur|cible
  */
-static void export_commands(const char *filename, command_t cmds[], int n) {
+void export_commands(const char *filename, command_t cmds[], int n) {
 
     FILE *file = fopen(filename, "w");
     if (!file) return;
@@ -43,6 +43,12 @@ int handle_text_request(void)
 
     int w = lexical_analysis(input, words);
     int c = interpret_words(words, w, cmds);
+
+    /* Aucun résultat exploitable */
+    if (c == 0) {
+        printf("\n%s\n", txt("CMD_ERROR"));
+        return 0;
+    }
     
     printf("\n%s\n", txt("REQUEST_CMD"));
     for (int i = 0; i < c; i++) {
@@ -57,5 +63,3 @@ int handle_text_request(void)
     
     return 1;
 }
-
-

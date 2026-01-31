@@ -43,7 +43,7 @@ int interpret_words(word_t words[], int n, command_t cmds[])
             if (!strcmp(words[i].value, "ZIGZAG")) {
 
                 char move_action[16] = "forward";
-                double step = 1.0;
+                double step = 10.0;
                 double angle = 45.0;
 
                 /* Recherche du dernier déplacement AVANT zigzag */
@@ -92,7 +92,7 @@ int interpret_words(word_t words[], int n, command_t cmds[])
 
                 for (int k = 0; k < 8; k++) {
                     strcpy(cmds[command_count].action, "forward");
-                    cmds[command_count].value = 1.0;
+                    cmds[command_count].value = 0.5;
                     cmds[command_count].target[0] = '\0';
                     command_count++;
 

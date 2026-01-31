@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include "image.h"
 
-/*============================================================================*/
-/*  Auteur        : Adrien Nosel                                               */
-/*  Date création : 13/12/2025                                                 */
-/*                                                                            */
-/*  Description   : Implémentation des fonctions de chargement,               */
-/*                  quantification et écriture d'images RGB.                 */
-/*============================================================================*/
+/*==============================================================================*/
+/*  Auteur        : Adrien Nosel                                                */
+/*  Date création : 13/12/2025                                                  */
+/*                                                                              */
+/*  Description   : Implémentation des fonctions de chargement,                 */
+/*                  quantification et écriture d'images RGB.                    */
+/*==============================================================================*/
 
 /* ========================================================= */
 /*                  CHARGEMENT DE L'IMAGE                    */

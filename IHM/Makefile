@@ -6,8 +6,8 @@ TEXT_OBJS = $(TEXT_ENGINE)/config.o $(TEXT_ENGINE)/lexer.o $(TEXT_ENGINE)/interp
 
 all: IHM_main.out
 
-IHM_main.out: IHM_main.o IHM.o ../lang.o $(TEXT_OBJS)
-	gcc -o $@ IHM_main.o IHM.o ../lang.o $(TEXT_OBJS) $(CFLAGS)
+IHM_main.out: IHM_main.o IHM.o configuration.o ../lang.o $(TEXT_OBJS)
+	gcc -o $@ IHM_main.o IHM.o configuration.o ../lang.o $(TEXT_OBJS) $(CFLAGS)
 
 ../lang.o: ../lang.c ../lang.h
 	gcc $(CFLAGS) -c ../lang.c -o ../lang.o
@@ -17,6 +17,9 @@ IHM_main.o: IHM.h IHM_main.c
 
 IHM.o: IHM.c IHM.h
 	gcc $(CFLAGS) -c IHM.c -o IHM.o
+
+configuration.o: configuration.c configuration.h ../lang.h
+	gcc $(CFLAGS) -c configuration.c -o configuration.o
 
 clean:
 	rm -f *.o IHM_main.out IMG_300_Q/*.txt IMG_300_AC/*.pgm

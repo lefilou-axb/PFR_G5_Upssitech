@@ -1,31 +1,35 @@
-/*================================================================
+/* =================================================================
+Groupe  : 5
+Auteur  : Antonin GERAIN 
 
-Groupe : 5
-
-Code écrit par : Antonin GERAIN 
-
-Fonction du code : 
-    - Interface utilisateur et administrateur du logiciel embarqué
-    - Intégration des autres modules (Traitement d'image, Requêtes 
-        textes, Requêtes vocales et Simulation).
-
-================================================================*/
+Description :   Interface utilisateur et administrateur du logiciel 
+                embarqué
+                Intégration des autres modules (Traitement d'image, 
+                Requêtes textes, Requêtes vocales et Simulation).
+=================================================================== */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
+#include "configuration.h"
+
+/* ================= FONCTIONS REQUÊTES TEXTES ================= */
 #include "text_request.h"
 #include "config.h"
 #include "IHM.h"
 #include "lang.h"
+#include "lexer.h"
+#include "interpreter.h"
+/* ============================================================= */
 
+/* ================= FONCTIONS TRAITEMENT IMAGES ================= */
 #include "image.h"
 #include "module_test.h"
+/* =============================================================== */
 
 /* ================= MENUS ================= */
-
 void ecran_accueil()
 {
     printf("\n========================================\n\n");
@@ -39,7 +43,7 @@ void menu_principal()
     printf("%s\n", txt("MENU_MAIN"));
     printf("> ");
 
-    while (!saisir_choix(&choix)) {
+    while (!saisir_choix(&choix) || choix > 3) {
         printf("%s\n", txt("INPUT_ERROR"));
         printf("> ");
     }
@@ -56,37 +60,37 @@ void menu_principal()
             printf("\n========================================\n\n");
             printf("%s\n", txt("EXIT_MSG"));
             exit(EXIT_SUCCESS);
-        default: break;
+        default: 
+            break;
     }
 }
 
 void menu_utilisateur()
 {
     int choix = 0;
-    do {
-        printf("\n%s\n\n", txt("TITLE_USER"));
-        printf("\n%s\n", txt("USER_MENU"));
-        printf("> ");
-        
-        while (!saisir_choix(&choix)) {
-            printf("%s\n", txt("INPUT_ERROR"));
-            printf("> ");
-        }
 
-        switch (choix) {
-            case 1:
-                menu_pilotage_robot();
-                break;
-            case 2:
-                menu_traitement_image();
-                break;
-            default: break;
-        }
-    } while (choix != 3);
+    printf("\n%s\n\n", txt("TITLE_USER"));
+    printf("\n%s\n", txt("USER_MENU"));
+    printf("> ");
+        
+    while (!saisir_choix(&choix) || choix > 3) {
+        printf("%s\n", txt("INPUT_ERROR"));
+        printf("> ");
+    }
+
+    switch (choix) {
+        case 1:
+            choix_environnement();
+            break;
+        case 2:
+            menu_traitement_image();
+            break;
+        default:
+            break;
+    }
 }
 
 /* ================= PILOTAGE ================= */
-
 void choix_environnement()
 {
     int env;
@@ -98,7 +102,10 @@ void choix_environnement()
         printf("> ");
     }
 
-    printf("Environnement %d selectionne\n", env);
+    printf("\n%s\n", txt("ENV_SELECT"));
+    printf(" %d\n", env);
+
+    menu_pilotage_robot();
 }
 
 void menu_pilotage_robot()
@@ -106,31 +113,25 @@ void menu_pilotage_robot()
     int choix = 0;
 
     printf("\n%s\n\n ", txt("TITLE_PILOTING"));
-    choix_environnement();
+    printf("\n%s\n", txt("PILOT_MENU"));
+    printf("> ");
 
-    do {
-        printf("\n========================================\n\n");
-        printf("\n%s\n", txt("PILOT_MENU"));
+    while (!saisir_choix(&choix) || choix > 3) {
+        printf("%s\n", txt("INPUT_ERROR"));
         printf("> ");
+    }
 
-        while (!saisir_choix(&choix)) {
-            printf("%s\n", txt("INPUT_ERROR"));
-            printf("> ");
+    switch (choix) {
+        case 1:
+            pilotage_vocal();
+            break;
+        case 2:
+            pilotage_textuel();
+            break;
+        case 3:
+            menu_utilisateur();
+        default: break;
         }
-
-        switch (choix) {
-            case 1:
-                pilotage_manuel();
-                break;
-            case 2:
-                pilotage_vocal();
-                break;
-            case 3:
-                pilotage_textuel();
-                break;
-            default: break;
-        }
-    } while (choix != 4);
 }
 
 void pilotage_manuel()
@@ -142,55 +143,94 @@ void pilotage_manuel()
 void pilotage_vocal()
 {
     printf("\n%s\n\n", txt("TITLE_VOICE"));
-    //printf("\n%s\n", txt("VOCAL_MSG"));
-
     system("python3 ../Module_vocal/Module_vocal.py");
+    
+    // --- Lire le résultat de la transcription ---
+    /*FILE *file = fopen("vocal_res.txt", "r");
+    if (file != NULL) {
+        char buffer[256];
+        if (fgets(buffer, sizeof(buffer), file)) {
+            printf("Traitement de la commande vocale : %s\n", buffer);
+            
+            word_t words[255];
+            command_t cmds[255];
+
+            int w = lexical_analysis(buffer, words);
+            int c = interpret_words(words, w, cmds);
+            
+            // Export pour la simulation
+            export_commands("commands.txt", cmds, c); 
+            
+            printf("\n%s\n", txt("REQUEST_EXP"));
+            
+            // Lancer la simulation (comme dans pilotage_textuel)
+            system("python3 ../Simulation/readCmd.py");
+        }
+        fclose(file);
+        remove("vocal_res.txt"); // Nettoyage
+    } else {
+        printf("Erreur : Impossible de récupérer la commande vocale.\n");
+    }*/
+
+    /*if (handle_text_request()) {
+        system("python3 ../Simulation/readCmd.py");
+    }*/
+
+    menu_pilotage_robot();
 }
 
 void pilotage_textuel()
 {
     printf("\n%s\n\n", txt("TITLE_TEXTUAL"));
-
     printf("\n%s\n", txt("REQUEST_MSG"));
 
-    /*while (1) {
-        if (!handle_text_request())
-            break;
-    }*/
+    if (handle_text_request()) {
+        system("python3 ../Simulation/readCmd.py");
+    }
+    
+    menu_pilotage_robot();
 
-    handle_text_request();
-
-    system("python3 ../Simulation/readCmd.py");
 }
 
 
 /* ================= IMAGE ================= */
-
 void menu_traitement_image()
 {
     /*--------------------------DECLRATION--------------------------*/
     /* Paramètres */
     int num = 5389;   /*indice de la première image à quantifier (5389)*/
     int nb = 20;      /*nombre d'images à quantifier (20 dans le dossier fourni)*/
+
     /*les deux première variables sont des constantes car c'est toujours je même
      fichier avec toujours les mêmes images dedans et toujours le même nombre
      d'images. Mais par la suite nous aurons peutêtre besoin d'avoir ces parametres
      hors des fonctions.*/
-    int nb_bits = 2;  /*nombre de bits de quantification (1 à 8)*/
+
+    int bit, vmin, vmax;
+    int nb_bits;  /*nombre de bits de quantification (1 à 8)*/
     /*------------------------------------------------------------*/
 
     printf("\n%s\n\n", txt("TITLE_IMAGE"));
     printf("\n%s\n", txt("IMAGE_MENU"));
 
+    if (!lire_config("config/image.txt", &bit, &vmin, &vmax, &nb_bits)) {
+        printf("%s\n", txt("READ_ERROR"));
+    } 
+    else {
+        printf("%s\n", txt("CONFIG_VALUE_RETRIEVED"));
+        printf("> %d\n", nb_bits);
+    }
+
     quantification_IMG300(num, nb, nb_bits);
     txt_to_image(num, nb, nb_bits);
 
     printf("\n%s\n", txt("IMAGE_END"));
+
+    menu_utilisateur();
 }
 
 
-/* ================= ADMIN ================= */
-
+/* ================= ADMINISTRATEUR ================= */
 int connexion_admin()
 {
     char id[32], mdp[32];
@@ -239,6 +279,7 @@ int connexion_admin()
     }
 
     printf("\n");
+    menu_principal();
 
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
@@ -246,28 +287,80 @@ int connexion_admin()
     return 0;
 }
 
-
-
 void menu_administrateur()
 {
     int choix = 0;
-    do {
-        printf("\n%s\n\n", txt("TITLE_ADMIN"));
-        printf("\n%s\n", txt("ADMIN_MENU"));
+
+    printf("\n%s\n\n", txt("TITLE_ADMIN"));
+    printf("\n%s\n", txt("ADMIN_MENU"));
+    printf("> ");
+
+    while (!saisir_choix(&choix) || choix > 2) {
+        printf("%s\n", txt("INPUT_ERROR"));
         printf("> ");
+    }
 
-        while (!saisir_choix(&choix)) {
-            printf("%s\n", txt("INPUT_ERROR"));
-            printf("> ");
-        }
+    switch (choix) {
+        case 1: 
+            menu_config_image();
+            break;
+        case 2: 
+            break;
+    }
+}
 
-        switch (choix) {
-            case 1: 
-                afficher_fichier("config/image.csv"); break;
-            case 2: 
-                afficher_fichier("config/requetes.csv"); break;
-            default: break;
-        }
-        
-    } while (choix != 3);
+/* ================= CONFIGURATIONS ================= */
+void menu_config_image()
+{
+    int choix = 0;
+
+    int bit, vmin, vmax, mod;
+
+    printf("\n%s\n\n", txt("TITLE_CONFIG_IMG"));
+    printf("%s\n", txt("CONFIG_MENU"));
+    printf("> ");
+
+    while (!saisir_choix(&choix) || choix < 1 || choix > 2) {
+        printf("%s\n", txt("INPUT_ERROR"));
+        printf("> ");
+    }
+
+    switch (choix) {
+
+        case 1:
+            /* Lecture du fichier */
+            if (!lire_config("config/image.txt", &bit, &vmin, &vmax, &mod)) {
+                printf("%s\n", txt("READ_ERROR"));
+                break;
+            }
+
+            /* Affichage */
+            afficher_config(bit, vmin, vmax, mod);
+
+            /* Saisie nouvelle valeur */
+            if (!saisir_valeur(&mod)) {
+                printf("%s\n", txt("WRITE_ERROR"));
+                break;
+            }
+
+            /* Vérification simple */
+            if (mod < vmin || mod > vmax) {
+                printf("%s [%d ; %d]\n", txt("CONFIG_OUT_OF_RANGE"), vmin, vmax);
+                break;
+            }
+
+            /* Écriture */
+            if (!ecrire_config("config/image.txt", bit, vmin, vmax, mod)) {
+                printf("%s\n", txt("CONFIG_WRITE_ERROR"));
+                break;
+            }
+
+            printf("%s\n", txt("CONFIG_UPDATE_SUCCESS"));
+            break;
+        case 2:
+            break;
+    }
+
+    menu_administrateur();
+
 }

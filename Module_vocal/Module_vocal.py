@@ -33,26 +33,32 @@ if __name__ == "__main__":
     
     try:
         with sr.Microphone() as source:
-            # Réglage du bruit ambiant
+            # --- Réglage du bruit ambiant ---
             print("Réglage du bruit ambiant... (ne parlez pas 1 sec)")
             r.adjust_for_ambient_noise(source)
             
-            # Ecoute de la source micro par défaut
+            # --- Ecoute de la source micro par défaut ---
             print("Je vous écoute (Speak!)...")
             audio_data = r.listen(source)
             print("Fin de l'écoute (End!)")
             
             try:
-                # Reconnaissance de la voix par Google
+                # --- Reconnaissance de la voix par Google ---
                 transcription = r.recognize_google(audio_data, language="fr-FR")
                 print(f"Vous avez dit : {transcription}")
+
+                # --- Simulation ---
+                #subprocess.run(["python", "../Simulation/readCmd.py"])
                 
-                # Tokenisation
+                # --- Tokenisation ---
                 tokens = normaliser_transcription(transcription)
                 print(f"Mots clés : {tokens}")
-                #subprocess.run(["../text_engine/main", transcription]) #modifier le .exe par celui de ny aina
+
+                # --- Lecture text_request ---
+                with open("vocal_res.txt", "w", encoding="utf-8") as f:
+                    f.write(transcription)
                 
-                # Réponse vocale
+                # --- Réponse vocale ---
                 text_to_speech("Commande reçu: " + transcription)
                 
             except sr.UnknownValueError:

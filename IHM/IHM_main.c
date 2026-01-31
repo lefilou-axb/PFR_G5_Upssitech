@@ -1,15 +1,11 @@
-/*================================================================
+/* ===============================================================
+Groupe  : 5
+Auteur  : Antonin GERAIN 
 
-Groupe : 5
-
-Code écrit par : Antonin GERAIN 
-
-Fonction du code : 
-    - Programme principal de l'interface.
-    - Importation du fichier de la langue sélectionnée.
-    - Appel la fonction ecran_accueil.
-
-================================================================*/
+Description :   Programme principal de l'interface.
+                Importation du fichier de la langue sélectionnée.
+                Appel la fonction ecran_accueil et menu_principal.
+=============================================================== */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,19 +15,33 @@ Fonction du code :
 
 int main()
 {
+    /* INITIALISATION DE LA LANGUE */
     int langue = 0;
+    
+    /* CHOIX DE LA LANGUE */
+    while (langue == 0) {
+        langue = choisir_langue();
+    }
 
-    langue = choisir_langue();
+    /* CHARGEMENT DE LA LANGUE DANS L'INTERFACE */
+    switch (langue) {
+        case 1: 
+            charger_langue("lang/fr.txt");
+            break;
+        case 2:
+            charger_langue("lang/en.txt");
+            break;
+        default: 
+            break;
+    }
 
-    if (langue == 1)
-        charger_langue("lang/fr.txt");
-    else
-        charger_langue("lang/en.txt");
-
+    /* CHARGEMENT DE LA LANGUE DES REQUÊTES */
     load_configuration(langue);
 
+    /* AFFICHAGE DE L'ACCUEIL */
     ecran_accueil();
 
+    /* AFFICHAGE DU MENU PRINCIPAL */
     while (1)
 
         menu_principal();

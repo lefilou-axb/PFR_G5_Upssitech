@@ -7,7 +7,7 @@ HG = 0
 BD = 0
 BG = 0
 
-obstacle1 = {
+balle_Green = {
     "nom" : "obstacle1",
     "type" : "cercle",
     "positionCentre" : (0,0),
@@ -27,7 +27,7 @@ piece2 = {
     "nom": "piece1",
     "dimensions": (400,400), #(Largeur,Longueur) de la piece
     "positionCoinHautDroit": (200,200), #Position du coin haut droit (x_HD, y_HD)
-    "obstacle": [obstacle1] #liste vide à renseigner plus tard
+    "obstacle": [balle_Green] #liste vide à renseigner plus tard
 }
 
 
@@ -66,7 +66,7 @@ for i in range(len(cmd_list)):
         print(f"Pas de valeur pour la commande : {commande}")
     
     if(commande == "forward"):
-        t.forward(valeur)
+        t.forward(valeur*100)
     
     if((commande == "turn") or (commande == "left")):
         if(valeur > 0):
@@ -84,7 +84,10 @@ for i in range(len(cmd_list)):
         t.backward(valeur)
     
     if(commande == "goto"):
-        t.goto(valeur)
+        if(valeur == 0):
+            t.goto(balle_Green["positionCentre"])
+        else :
+            print("Objet inconnu")
     
 t.up()
 t.done()
