@@ -38,7 +38,7 @@ piece2 = {
     "nom": "piece1",
     "dimensions": (400,400), #(Largeur,Longueur) de la piece
     "positionCoinHautDroit": (200,200), #Position du coin haut droit (x_HD, y_HD)
-    "obstacle": [balle_Green] 
+    "obstacle": [balle_Green] #liste vide à renseigner plus tard
 }
 
 
@@ -48,12 +48,12 @@ cmd_list = []
 depart = (50,50)
 
 # Lecture du fichier et remplissage de la liste des commandes
-with open("commands.txt","r") as file:
+with open("../IHM/commands.txt","r") as file:
     for ligne in file:
         ligne = ligne.strip()
-        print(ligne)
+        #print(ligne)
         cmd_list.append(ligne)
-print(cmd_list)
+#print(cmd_list)
 
 table.tracerPiece(piece2)
 
@@ -79,7 +79,7 @@ for i in range(len(cmd_list)):
     
     # Tests pour effectuer les déplacements
     if(commande == "forward"):
-        t.forward(valeur)
+        t.forward(valeur*100)
     
     if((commande == "turn") or (commande == "left")):
         if(valeur > 0):
@@ -97,11 +97,7 @@ for i in range(len(cmd_list)):
         t.backward(valeur)
     
     if(commande == "goto"):
-        print(valeur)
-        if(valeur == 0):
-            t.goto(balle_Green["positionCentre"])
-        else :
-            print("Objet inconnu")
+        t.goto(valeur)
     
 t.up()
 t.done()

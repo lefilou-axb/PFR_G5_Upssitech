@@ -1,4 +1,0 @@
-commande valeur
-forward 3.00
-left 90.00
-goto 2

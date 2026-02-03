@@ -10,10 +10,10 @@ import turtle as t
 
 def tracerPiece(la_piece):
     #Test pour savoir si la piece est carré ou non
-    if la_piece["dimensions"][0] == la_piece["dimensions"][1]: #Test sur la valeur du constituant
-        print("Piece carré de dimension : ", la_piece["dimensions"][0])
-    else :
-        print("Piece non carré, largeur = ", la_piece["dimensions"][0], " et longueur = ", la_piece["dimensions"][1])
+    #if la_piece["dimensions"][0] == la_piece["dimensions"][1]: #Test sur la valeur du constituant
+        #print("Piece carré de dimension : ", la_piece["dimensions"][0])
+    #else :
+        #print("Piece non carré, largeur = ", la_piece["dimensions"][0], " et longueur = ", la_piece["dimensions"][1])
 
 
     #Initialisation de la position des coins de la piece
@@ -29,7 +29,7 @@ def tracerPiece(la_piece):
     #Initialisation de la variable contenant les coins de la piece
     coin_piece = [HD, BD, BG, HG]   
 
-    print(coin_piece) #Affichage de la position des coins    
+    #print(coin_piece) #Affichage de la position des coins    
 
 
     # Prise en compte d'une pièce
@@ -75,19 +75,19 @@ def ajouter_obstacle(obstacle,piece):
     #Test pour savoir si on peut poser l'obstacle
     if obstacle["positionCentre"][0]+obstacle["dimension_Rayon_Cote"]+5 > HD[0] or obstacle["positionCentre"][1]+5 > HD[1] :
         obstaclePossible = False
-        print("HD") #TRACE DE DEBUG
+        #print("HD") #TRACE DE DEBUG
     if obstacle["positionCentre"][0]+obstacle["dimension_Rayon_Cote"]+5 > BD[0] or obstacle["positionCentre"][1]-5 < BD[1] :
         obstaclePossible = False
-        print("BD") #TRACE DE DEBUG
+        #print("BD") #TRACE DE DEBUG
     if obstacle["positionCentre"][0]+obstacle["dimension_Rayon_Cote"]-5 < HG[0] or obstacle["positionCentre"][1]-5 > HG[1] :
         obstaclePossible = False
-        print("HG") #TRACE DE DEBUG
+        #print("HG") #TRACE DE DEBUG
     if obstacle["positionCentre"][0]-obstacle["dimension_Rayon_Cote"]-5 < BG[0] or obstacle["positionCentre"][1]+5 < BG[1] :
         obstaclePossible = False
-        print("BG") #TRACE DE DEBUG
+        #print("BG") #TRACE DE DEBUG
     if obstaclePossible == False :
             print("L'obstacle ne peut pas être placé, il est hors dimension de la pièce.")
-            print("Obstacle voulu en : ", obstacle["positionCentre"])
+            #print("Obstacle voulu en : ", obstacle["positionCentre"])
     else :
         # Traçage de l'obstacle
         t.width(obstacle["epaisseur"])                    # largeur du trait des ouvertures
@@ -116,10 +116,10 @@ def ajouter_obstacle(obstacle,piece):
             t.end_fill()
                   
         t.up()                         # retour en position haute
-        print("Obstacle tracé en : ", obstacle["positionCentre"])
+        #print("Obstacle tracé en : ", obstacle["positionCentre"])
         piece["obstacle"].append(obstacle)
     
 
-def tracer_obstacles_piece(piece):
-    for i in range(len(piece["obstacle"])):
-        print(piece["obstacle"][i]["nom"])
+#def tracer_obstacles_piece(piece):
+    #for i in range(len(piece["obstacle"])):
+        #print(piece["obstacle"][i]["nom"])
