@@ -1,13 +1,24 @@
+# ***************************************************************************************
+#   Nom : Haegel                                                                        *
+#   Prénom : Lucas                                                                      *
+#   Définition : Ce fichier contient le programme permettant le déplacement du robot    *
+#           dans une interface visible. Il implémente les caractéristiques de           *
+#           l'environnement et des obstacles ainsi la lecture et l'exécutions des       *
+#           commandes de déplacement à exécuter                                         *
+#                                                                                       *
+# ***************************************************************************************
+
+#Bibiliothèques
 import turtle as t
 import table
 
-#Initialisation de la piece
+#Initialisation des pieces & des obstacles
 HD = 0
 HG = 0
 BD = 0
 BG = 0
 
-obstacle1 = {
+balle_Green = {
     "nom" : "obstacle1",
     "type" : "cercle",
     "positionCentre" : (0,0),
@@ -27,7 +38,7 @@ piece2 = {
     "nom": "piece1",
     "dimensions": (400,400), #(Largeur,Longueur) de la piece
     "positionCoinHautDroit": (200,200), #Position du coin haut droit (x_HD, y_HD)
-    "obstacle": [obstacle1] #liste vide à renseigner plus tard
+    "obstacle": [balle_Green] 
 }
 
 
@@ -47,6 +58,7 @@ print(cmd_list)
 table.tracerPiece(piece2)
 
 # Déplacement du robot
+#Initialisation des déplacements
 t.goto(depart)
 t.width(2)
 t.color('red')
@@ -65,6 +77,7 @@ for i in range(len(cmd_list)):
     except :
         print(f"Pas de valeur pour la commande : {commande}")
     
+    # Tests pour effectuer les déplacements
     if(commande == "forward"):
         t.forward(valeur)
     
@@ -84,7 +97,11 @@ for i in range(len(cmd_list)):
         t.backward(valeur)
     
     if(commande == "goto"):
-        t.goto(valeur)
+        print(valeur)
+        if(valeur == 0):
+            t.goto(balle_Green["positionCentre"])
+        else :
+            print("Objet inconnu")
     
 t.up()
 t.done()

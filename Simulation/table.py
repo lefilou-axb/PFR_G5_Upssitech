@@ -1,3 +1,10 @@
+# ***************************************************************************************
+#   Nom : Haegel                                                                        *
+#   Prénom : Lucas                                                                      *
+#   Définition : Ce fichier contient les fonctions de traçage de pieces et d'obstacles. *
+#                                                                                       *
+# ***************************************************************************************
+
 # bibliothèque
 import turtle as t
 

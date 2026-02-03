@@ -1,9 +1,4 @@
 commande valeur
-forward 20.00
+forward 3.00
 left 90.00
-backward 120.00
-right 1.00
-backward 1.00
-left 45.00
-backward 1.00
-right 45.00
+goto 2
