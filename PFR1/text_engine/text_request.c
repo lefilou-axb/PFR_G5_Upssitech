@@ -1,26 +1,21 @@
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include "lexer.h"
 #include "interpreter.h"
 #include "config.h"
-#include "lang.h"
+#include "text_request.h"
 
-/*
- * Exporte les commandes pour la simulation
- * Format : action,valeur|cible
- */
-void export_commands(const char *filename, command_t cmds[], int n) {
-
+static void export_commands(const char *filename,
+                            command_t cmds[],
+                            int n) {
     FILE *file = fopen(filename, "w");
     if (!file) return;
-    //fprintf(file,"%s\n","commande,valeur");
     for (int i = 0; i < n; i++) {
         if (cmds[i].target[0])
             fprintf(file, "%s %s\n", cmds[i].action, cmds[i].target);
         else
             fprintf(file, "%s %.2f\n", cmds[i].action, cmds[i].value);
     }
-
     fclose(file);
 }
 
@@ -30,27 +25,17 @@ int handle_text_request(void)
     word_t words[MAX_WORDS];
     command_t cmds[MAX_COMMANDS];
 
-    printf("> ");
-
-    if (!fgets(input, sizeof(input), stdin))
-        return 1;  // on continue par défaut
-
-    input[strcspn(input, "\n")] = 0; // suppression du \n
-
-    /* condition de sortie */
-    if (strcmp(input, "1") == 0)
-        return 0;
+    printf("Veuillez entrer une commande texte :\n> ");
+    fgets(input, sizeof(input), stdin);
 
     int w = lexical_analysis(input, words);
     int c = interpret_words(words, w, cmds);
 
-    /* Aucun résultat exploitable */
     if (c == 0) {
-        printf("\n%s\n", txt("CMD_ERROR"));
         return 0;
     }
-    
-    printf("\n%s\n", txt("REQUEST_CMD"));
+
+    printf("\nCommandes générées :\n");
     for (int i = 0; i < c; i++) {
         if (cmds[i].target[0])
             printf("- %s %s\n", cmds[i].action, cmds[i].target);
@@ -58,8 +43,16 @@ int handle_text_request(void)
             printf("- %s %.2f\n", cmds[i].action, cmds[i].value);
     }
 
-    export_commands("commands.txt", cmds, c);
-    printf("\n%s\n", txt("REQUEST_EXP"));
-    
+    export_commands("/home/ny_aina/commands.txt", cmds, c);
+    printf("\nCommandes exportées dans commands.txt\n");
     return 1;
+}
+
+void commander_robot(void) {
+    if (handle_text_request()) {
+        int ret = system("python3 /home/ny_aina/send_commands_WINDOWS.py");
+        if (ret != 0) {
+            fprintf(stderr, "Erreur lors de l'exécution du script Python\n");
+        }
+    }
 }

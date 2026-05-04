@@ -3,18 +3,11 @@
 #include "text_request.h"
 
 int main(void) {
-
-    /*if (!load_configuration(langue)) {
+    if (!load_configuration()) {
         printf("Erreur chargement configuration\n");
         return 1;
     }
-
     printf("Langue chargée : %s\n", current_language);
-    
-    while (1) {
-        if (!handle_text_request())
-            break;
-    }*/
-
+    commander_robot();
     return 0;
 }
