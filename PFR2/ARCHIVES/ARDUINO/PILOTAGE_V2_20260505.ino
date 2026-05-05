@@ -183,11 +183,9 @@ bool verifierObstacles() {
   // Vérifier selon le type de mouvement
   if (currentMoveType == 1 || currentMoveType == 1) { // Avance ou recule
     if (currentMoveType == 1 && (cpt1 < OBSTACLE_DISTANCE || cpt3 < OBSTACLE_DISTANCE)) {
-      Serial.println("⚠️  OBSTACLE DÉTECTÉ EN AVANT !");
       return false;
     }
     if (currentMoveType == 2 && cpt2 < OBSTACLE_DISTANCE) {
-      Serial.println("⚠️  OBSTACLE DÉTECTÉ EN ARRIÈRE !");
       return false;
     }
   }
@@ -207,7 +205,7 @@ void traiterCommande(String commande) {
   String valeurStr = commande.substring(espaceIndex + 1);
   float valeur = valeurStr.toFloat();
   
-  Serial.print("📋 Commande reçue: [");
+  Serial.print("Commande reçue: [");
   Serial.print(cmd);
   Serial.print("] [");
   Serial.print(valeur);
@@ -229,7 +227,7 @@ void traiterCommande(String commande) {
     stopMoteurs();
   }
   else {
-    Serial.println("❌ Commande inconnue !");
+    Serial.println("Commande inconnue !");
   }
 }
 
@@ -265,32 +263,60 @@ void setup() {
 
 // ==================== LOOP PRINCIPAL ====================
 void loop() {
-  
+
+  // Lecture capteurs
+  float cpt1 = mesurerDistance(TRIG1, ECHO1);
+  float cpt2 = mesurerDistance(TRIG2, ECHO2);
+  float cpt3 = mesurerDistance(TRIG3, ECHO3);
+
   // ===== 1. VÉRIFIER COMMANDES BLUETOOTH (Priorité haute) =====
   if (Serial1.available() > 0) {
     bluetoothCommand = Serial1.read();
     
-    Serial.print("📱 Commande Bluetooth reçue : ");
+    Serial.print("Commande Bluetooth reçue : ");
     Serial.println(bluetoothCommand);
     
     // Stopper tout mouvement en cours
     if (isMoving) {
       stopMoteurs();
-      Serial.println("⛔ Mouvement interrompu par Bluetooth");
+      Serial.println("Mouvement interrompu par Bluetooth");
     }
     
     // Exécuter la commande Bluetooth immédiatement
     switch (bluetoothCommand) {
       case 1: // Avancer
-        if (verifierObstacles()) {
+        if (cpt1 > 40.0 && cpt3 > 40.0) {
           avancer();
         } else {
           stopMoteurs();
+          delay(200);
+          
+          // Reculer
+          if (cpt2 >= 40.0) {
+          reculer();
+          delay(400);
+          stopMoteurs();
+          delay(200);
+        }
+
+        // Choix de direction
+        if (cpt1 > cpt3) {
+          droite();   // plus d’espace à droite
+        } else {
+          gauche();   // plus d’espace à gauche
+        }
+
+        delay(750);
+        stopMoteurs();
         }
         break;
         
       case 2: // Reculer
-        reculer();
+        if (cpt2 >= 40.0) {
+          reculer();
+        } else {
+          stopMoteurs();
+        }
         break;
         
       case 3: // Tourner à gauche
@@ -335,7 +361,6 @@ void loop() {
     
     // Vérifier les obstacles pendant le mouvement
     if (!verifierObstacles()) {
-      Serial.println("❌ ARRÊT D'URGENCE - Obstacle détecté!");
       stopMoteurs();
       delay(500);
       
@@ -364,35 +389,9 @@ void loop() {
     // Vérifier si le mouvement est terminé
     if (elapsedTime >= moveDuration) {
       stopMoteurs();
-      Serial.println("✅ Mouvement terminé");
+      Serial.println("Mouvement terminé");
     }
   }
   
   delay(100); // Petite pause pour éviter les lectures trop rapides
 }
-
-// ==================== CODE DE TEST (À DÉCOMMENTER) ====================
-/*
- * INSTRUCTIONS DE CALIBRAGE :
- * 1. Décommenter les lignes ci-dessous
- * 2. Uploader le code
- * 3. Ouvrir le moniteur série à 115200
- * 4. Tester les mouvements et ajuster DISTANCE_RATIO et ANGLE_RATIO
- * 
- * EXEMPLE DE TEST :
- * 
- * void testCalibration() {
- *   Serial.println("TEST 1: Avance 1 mètre");
- *   avancer();
- *   delay(5000);  // À adapter jusqu'à ce que le robot avance 1m
- *   stopMoteurs();
- *   delay(2000);
- *   
- *   Serial.println("TEST 2: Tourne 90°");
- *   droite();
- *   delay(750);  // À adapter jusqu'à 90°
- *   stopMoteurs();
- * }
- * 
- * // Appeler testCalibration() dans setup() pour lancer les tests
- */
