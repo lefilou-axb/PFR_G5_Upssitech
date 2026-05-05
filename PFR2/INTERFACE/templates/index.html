@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ROBOT CONTROL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #07090d;
+      --surface:   #0e1118;
+      --surface2:  #141820;
+      --border:    #1f2733;
+      --border2:   #2a3444;
+      --accent:    #4af0b0;
+      --accent2:   #f05a4a;
+      --accent3:   #4ab0f0;
+      --yellow:    #f0c04a;
+      --text:      #cdd9e5;
+      --muted:     #4a5a6a;
+      --muted2:    #6a7a8a;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-head: 'Syne', sans-serif;
+      --r:         6px;
+      --r2:        10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Grid overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(74,240,176,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,240,176,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* CRT scanlines */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+      );
+    }
+
+    #app {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      min-height: 100vh;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 18px;
+      gap: 14px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .logo-group { display: flex; align-items: center; gap: 14px; }
+
+    .logo {
+      font-family: var(--font-head);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: var(--accent);
+      position: relative;
+    }
+    .logo::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+    .logo em { color: var(--accent2); font-style: normal; }
+
+    .build-tag {
+      font-size: 10px; letter-spacing: 2px; color: var(--muted);
+      border: 1px solid var(--border); border-radius: var(--r);
+      padding: 2px 8px; text-transform: uppercase;
+    }
+
+    .status-bar { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+    .status-pill { display: flex; align-items: center; gap: 7px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: background .3s; flex-shrink: 0; }
+    .dot.on   { background: var(--accent); animation: pulse-green 2s infinite; }
+    .dot.off  { background: var(--accent2); }
+    .dot.warn { background: var(--yellow); animation: pulse-yellow 2s infinite; }
+
+    @keyframes pulse-green  { 0%,100%{ box-shadow:0 0 0 0 rgba(74,240,176,.5); } 50%{ box-shadow:0 0 0 5px rgba(74,240,176,0); } }
+    @keyframes pulse-yellow { 0%,100%{ box-shadow:0 0 0 0 rgba(240,192,74,.5); } 50%{ box-shadow:0 0 0 5px rgba(240,192,74,0); } }
+
+    .port-row { display: flex; align-items: center; gap: 7px; }
+
+    /* ── INPUTS ── */
+    select, input[type="text"], input[type="number"], textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: var(--r);
+      outline: none;
+      transition: border-color .2s;
+      -webkit-appearance: none;
+    }
+    select:focus, input:focus, textarea:focus { border-color: var(--accent); }
+    select { cursor: pointer; }
+
+    /* ── TABS ── */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+    .tab-btn {
+      font-family: var(--font-head); font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 10px 28px; background: transparent; border: none;
+      border-bottom: 2px solid transparent; color: var(--muted);
+      cursor: pointer; transition: color .2s, border-color .2s;
+      position: relative;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-panel { display: none; animation: fadeIn .25s ease; }
+    .tab-panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 20px;
+    }
+    .card-title {
+      font-family: var(--font-head); font-size: 10px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-title::before {
+      content: '';
+      width: 12px; height: 1px; background: var(--accent); flex-shrink: 0;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: var(--font-head); font-size: 10px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 7px 18px; border: 1px solid var(--border2); border-radius: var(--r);
+      background: var(--surface2); color: var(--text); cursor: pointer;
+      transition: all .15s; white-space: nowrap;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(74,240,176,.06); }
+    .btn:active { background: rgba(74,240,176,.14); transform: scale(.98); }
+    .btn.primary { border-color: var(--accent); color: var(--accent); background: rgba(74,240,176,.06); }
+    .btn.primary:hover { background: rgba(74,240,176,.14); }
+    .btn.danger  { border-color: var(--accent2); color: var(--accent2); background: rgba(240,90,74,.06); }
+    .btn.danger:hover { background: rgba(240,90,74,.14); }
+    .btn.big { font-size: 12px; padding: 12px 36px; }
+    .btn:disabled { opacity: .3; cursor: not-allowed; pointer-events: none; }
+
+    /* ── MISC ── */
+    .row  { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .mt   { margin-top: 14px; }
+    .mt8  { margin-top: 8px; }
+    hr.sep { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+
+    /* ════════════════════════════════════
+       TAB MANUEL
+    ════════════════════════════════════ */
+    .manual-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 640px) { .manual-layout { grid-template-columns: 1fr; } }
+
+    /* D-PAD */
+    .dpad-wrapper { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+    .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 76px);
+      grid-template-rows: repeat(3, 76px);
+      gap: 6px;
+      user-select: none;
+    }
+    .dpad-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--r); cursor: pointer;
+      transition: all .1s; touch-action: none;
+      font-size: 9px; letter-spacing: 1px; color: var(--muted);
+    }
+    .dpad-btn svg { width: 26px; height: 26px; fill: var(--muted); transition: fill .1s; }
+    .dpad-btn:hover { border-color: var(--accent); background: rgba(74,240,176,.06); }
+    .dpad-btn:hover svg { fill: var(--accent); }
+    .dpad-btn:hover { color: var(--accent); }
+    .dpad-btn.pressed {
+      background: rgba(74,240,176,.16); border-color: var(--accent);
+      transform: scale(.97);
+    }
+    .dpad-btn.pressed svg { fill: var(--accent); }
+    .dpad-btn.pressed { color: var(--accent); }
+
+    .dpad-stop {
+      background: rgba(240,90,74,.06); border-color: rgba(240,90,74,.35);
+    }
+    .dpad-stop svg { fill: var(--accent2); }
+    .dpad-stop { color: var(--accent2); }
+    .dpad-stop:hover { border-color: var(--accent2); background: rgba(240,90,74,.16); }
+    .dpad-empty { background: transparent; border: none; cursor: default; }
+
+    /* Last cmd */
+    .last-cmd {
+      width: 100%; padding: 10px 14px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--r); font-size: 11px; color: var(--muted);
+      text-align: center;
+    }
+    .last-cmd code { color: var(--accent); font-family: var(--font-mono); font-size: 12px; }
+
+    /* Precise command */
+    .prec-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .prec-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+
+    /* Telemetry */
+    .tele-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .tele-cell {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 12px 8px; text-align: center;
+    }
+    .tele-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .tele-value { font-size: 22px; color: var(--accent); margin-top: 4px; font-weight: 600; }
+    .tele-unit  { font-size: 9px; color: var(--muted2); margin-top: 1px; }
+    .tele-cell.alert .tele-value { color: var(--accent2); }
+
+    /* Keyboard hint */
+    .kbd-hint {
+      text-align: center; font-size: 10px; color: var(--muted);
+      letter-spacing: 1px;
+    }
+    kbd {
+      display: inline-block;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: 3px; padding: 1px 6px;
+      font-family: var(--font-mono); font-size: 10px;
+      color: var(--muted2);
+    }
+
+    /* ════════════════════════════════════
+       TAB TEXTE
+    ════════════════════════════════════ */
+    .text-layout { display: grid; gap: 16px; }
+
+    .lang-toggle { display: flex; gap: 6px; }
+    .lang-btn {
+      font-family: var(--font-head); font-size: 11px; font-weight: 700;
+      letter-spacing: 1px; padding: 5px 16px;
+      border: 1px solid var(--border); border-radius: var(--r);
+      background: var(--surface2); color: var(--muted); cursor: pointer;
+      transition: all .2s;
+    }
+    .lang-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(74,240,176,.06); }
+
+    #phrase-input {
+      width: 100%; min-height: 88px; resize: vertical;
+      padding: 12px 14px; font-size: 13px; line-height: 1.6;
+      border-radius: var(--r);
+    }
+    .send-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .send-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); cursor: pointer; }
+    .send-toggle input[type="checkbox"] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+
+    .examples { display: flex; gap: 6px; flex-wrap: wrap; }
+    .example-pill {
+      font-size: 11px; padding: 3px 12px;
+      border: 1px solid var(--border); border-radius: 20px;
+      color: var(--muted2); cursor: pointer; transition: all .2s;
+    }
+    .example-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Results */
+    .results-panel { display: none; }
+    .results-panel.visible { display: block; animation: fadeIn .25s ease; }
+
+    .c-output {
+      background: #020608; border: 1px solid var(--border);
+      border-radius: var(--r); padding: 12px 14px;
+      font-size: 11px; color: #4a9a6a; white-space: pre-wrap;
+      max-height: 140px; overflow-y: auto; line-height: 1.8;
+    }
+    .c-output::-webkit-scrollbar { width: 4px; }
+    .c-output::-webkit-scrollbar-thumb { background: var(--border2); }
+
+    .cmd-list { display: flex; flex-direction: column; gap: 7px; }
+    .cmd-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 16px; border-radius: var(--r);
+      border: 1px solid var(--border); background: var(--bg);
+      transition: border-color .2s;
+    }
+    .cmd-item:hover { border-color: var(--border2); }
+    .cmd-badge {
+      width: 32px; height: 32px; border-radius: var(--r);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+      border: 1px solid var(--border2);
+    }
+    .cmd-badge.fwd  { background: rgba(74,240,176,.08); border-color: rgba(74,240,176,.3); color: var(--accent); }
+    .cmd-badge.bwd  { background: rgba(240,192,74,.08); border-color: rgba(240,192,74,.3); color: var(--yellow); }
+    .cmd-badge.turn { background: rgba(74,176,240,.08); border-color: rgba(74,176,240,.3); color: var(--accent3); }
+    .cmd-badge.stop { background: rgba(240,90,74,.08); border-color: rgba(240,90,74,.3); color: var(--accent2); }
+    .cmd-badge.misc { background: rgba(74,240,176,.04); color: var(--muted2); }
+    .cmd-text { flex: 1; }
+    .cmd-action { color: var(--text); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+    .cmd-value  { color: var(--muted2); font-size: 12px; margin-left: 8px; }
+    .cmd-status { font-size: 10px; letter-spacing: 1px; white-space: nowrap; }
+    .cmd-status.ok   { color: var(--accent); }
+    .cmd-status.nok  { color: var(--accent2); }
+    .cmd-status.skip { color: var(--muted); }
+
+    /* History */
+    .history-list { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+    .history-list::-webkit-scrollbar { width: 4px; }
+    .history-list::-webkit-scrollbar-thumb { background: var(--border2); }
+    .history-item {
+      display: flex; align-items: baseline; gap: 12px;
+      padding: 7px 12px; border-radius: var(--r);
+      border: 1px solid transparent; cursor: pointer; transition: border-color .2s;
+    }
+    .history-item:hover { border-color: var(--border); background: var(--surface2); }
+    .history-time { font-size: 10px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+    .history-phrase { flex: 1; font-size: 12px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history-count { font-size: 10px; color: var(--accent); white-space: nowrap; }
+    .empty-history { font-size: 12px; color: var(--muted); font-style: italic; padding: 8px 12px; }
+
+    /* Spinner */
+    .spinner {
+      display: none; width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid var(--border2); border-top-color: var(--accent);
+      animation: spin .7s linear infinite; flex-shrink: 0;
+    }
+    .spinner.active { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 9px; letter-spacing: 2px; color: var(--muted);
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 200;
+      padding: 10px 20px; border-radius: var(--r); font-size: 11px;
+      letter-spacing: 1px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text);
+      opacity: 0; transform: translateY(12px);
+      transition: opacity .25s, transform .25s; pointer-events: none;
+      font-family: var(--font-head); text-transform: uppercase;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.ok   { border-color: var(--accent); color: var(--accent); }
+    #toast.err  { border-color: var(--accent2); color: var(--accent2); }
+    #toast.warn { border-color: var(--yellow); color: var(--yellow); }
+
+    /* Right column stack */
+    .right-col { display: flex; flex-direction: column; gap: 12px; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════ HEADER ══════════ -->
+  <header>
+    <div class="logo-group">
+      <div class="logo">ROBOT<em>.</em>CTL</div>
+      <span class="build-tag">v1.0 · Pi 3B</span>
+    </div>
+    <div class="status-bar">
+      <div class="status-pill">
+        <div class="dot" id="dot-serial"></div>
+        <span id="lbl-serial">SÉRIE</span>
+      </div>
+      <div class="status-pill" id="pill-c">
+        <div class="dot" id="dot-c"></div>
+        <span id="lbl-c">MOTEUR C</span>
+      </div>
+      <div class="port-row">
+        <select id="port-select" title="Port série"></select>
+        <button class="btn primary" id="btn-connect" onclick="toggleSerial()">CONNECTER</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════ TABS ══════════ -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('manual', this)">◈ MANUEL</button>
+    <button class="tab-btn"        onclick="switchTab('text',   this)">◈ TEXTE</button>
+  </div>
+
+  <!-- ══════════════════════════════════
+       TAB MANUEL
+  ══════════════════════════════════ -->
+  <div id="tab-manual" class="tab-panel active">
+    <div class="manual-layout">
+
+      <!-- D-PAD -->
+      <div class="card">
+        <div class="card-title">Pilotage directionnel</div>
+        <div class="dpad-wrapper">
+          <div class="dpad">
+            <div class="dpad-empty"></div>
+            <div class="dpad-btn" id="btn-forward"
+                 onmousedown="startMove('forward')" onmouseup="stopMove()"
+                 ontouchstart="ev(event,'forward')" ontouchend="stopMove()">
+              <svg viewBox="0 0 24 24"><path d="M12 4l-8 9h5v7h6v-7h5z"/></svg>
+              <span>FWD</span>
+            </div>
+            <div class="dpad-empty"></div>
+
+            <div class="dpad-btn" id="btn-left"
+                 onmousedown="startMove('left')" onmouseup="stopMove()"
+                 ontouchstart="ev(event,'left')" ontouchend="stopMove()">
+              <svg viewBox="0 0 24 24"><path d="M20 12l-9-8v5H4v6h7v5z"/></svg>
+              <span>LEFT</span>
+            </div>
+            <div class="dpad-btn dpad-stop" onclick="sendStop()">
+              <svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+              <span>STOP</span>
+            </div>
+            <div class="dpad-btn" id="btn-right"
+                 onmousedown="startMove('right')" onmouseup="stopMove()"
+                 ontouchstart="ev(event,'right')" ontouchend="stopMove()">
+              <svg viewBox="0 0 24 24"><path d="M4 12l9 8v-5h7v-6h-7V4z"/></svg>
+              <span>RIGHT</span>
+            </div>
+
+            <div class="dpad-empty"></div>
+            <div class="dpad-btn" id="btn-backward"
+                 onmousedown="startMove('backward')" onmouseup="stopMove()"
+                 ontouchstart="ev(event,'backward')" ontouchend="stopMove()">
+              <svg viewBox="0 0 24 24"><path d="M12 20l8-9h-5V4H9v7H4z"/></svg>
+              <span>BWD</span>
+            </div>
+            <div class="dpad-empty"></div>
+          </div>
+
+          <div class="kbd-hint">
+            <kbd>Z</kbd> <kbd>Q</kbd> <kbd>S</kbd> <kbd>D</kbd> &nbsp;/&nbsp; <kbd>↑</kbd> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd> &nbsp; raccourcis clavier
+          </div>
+
+          <div class="last-cmd" id="last-cmd-display">
+            Dernière commande : <code id="last-cmd-code">—</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLONNE DROITE -->
+      <div class="right-col">
+
+        <!-- Commande précise -->
+        <div class="card">
+          <div class="card-title">Commande précise</div>
+          <div class="prec-row">
+            <input type="number" id="prec-val" placeholder="0.5" step="0.1" min="0.01" style="width:100px;" />
+            <select id="prec-unit">
+              <option value="m">mètres</option>
+              <option value="deg">degrés</option>
+            </select>
+          </div>
+          <div class="prec-btns">
+            <button class="btn" onclick="sendTimed('forward')">↑ AVANCER</button>
+            <button class="btn" onclick="sendTimed('backward')">↓ RECULER</button>
+            <button class="btn" onclick="sendTimed('left')">← GAUCHE</button>
+            <button class="btn" onclick="sendTimed('right')">→ DROITE</button>
+          </div>
+        </div>
+
+        <!-- Capteurs ultrason -->
+        <div class="card">
+          <div class="card-title">Capteurs ultrason</div>
+          <div class="tele-grid">
+            <div class="tele-cell" id="tele-cell-1">
+              <div class="tele-label">Avant G</div>
+              <div class="tele-value" id="tele-s1">—</div>
+              <div class="tele-unit">cm</div>
+            </div>
+            <div class="tele-cell" id="tele-cell-3">
+              <div class="tele-label">Avant D</div>
+              <div class="tele-value" id="tele-s3">—</div>
+              <div class="tele-unit">cm</div>
+            </div>
+            <div class="tele-cell" id="tele-cell-2">
+              <div class="tele-label">Arrière</div>
+              <div class="tele-value" id="tele-s2">—</div>
+              <div class="tele-unit">cm</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       TAB TEXTE
+  ══════════════════════════════════ -->
+  <div id="tab-text" class="tab-panel">
+    <div class="text-layout">
+
+      <!-- Saisie -->
+      <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+          <div class="card-title" style="margin-bottom:0">Requête langage naturel</div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" id="lang-fr" onclick="setLang('fr')">FR</button>
+            <button class="lang-btn"        id="lang-en" onclick="setLang('en')">EN</button>
+          </div>
+        </div>
+
+        <!-- Exemples -->
+        <div class="section-label">Exemples rapides</div>
+        <div class="examples" id="examples-fr">
+          <span class="example-pill" onclick="useExample(this)">avance de 2 mètres</span>
+          <span class="example-pill" onclick="useExample(this)">tourne à droite de 90 degrés</span>
+          <span class="example-pill" onclick="useExample(this)">recule 50cm puis tourne à gauche</span>
+          <span class="example-pill" onclick="useExample(this)">demi-tour</span>
+        </div>
+        <div class="examples" id="examples-en" style="display:none">
+          <span class="example-pill" onclick="useExample(this)">move forward 2 meters</span>
+          <span class="example-pill" onclick="useExample(this)">turn right 90 degrees</span>
+          <span class="example-pill" onclick="useExample(this)">go back 50cm then turn left</span>
+          <span class="example-pill" onclick="useExample(this)">u-turn</span>
+        </div>
+
+        <textarea id="phrase-input" class="mt8"
+          placeholder="Ex : avance de 2 mètres puis tourne à droite de 90 degrés…"></textarea>
+
+        <div class="send-row mt">
+          <label class="send-toggle">
+            <input type="checkbox" id="chk-send" checked />
+            Envoyer à l'Arduino après analyse
+          </label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="spinner" id="spinner"></div>
+            <button class="btn big primary" id="btn-send" onclick="sendTextRequest()">
+              ▶ ANALYSER
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Résultats -->
+      <div class="card results-panel" id="results-panel">
+        <div class="card-title">Commandes générées</div>
+        <div class="cmd-list" id="cmd-list"></div>
+        <hr class="sep" />
+        <div class="section-label">Sortie du moteur C</div>
+        <div class="c-output" id="c-output"></div>
+      </div>
+
+      <!-- Historique -->
+      <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:0">Historique des requêtes</div>
+          <button class="btn danger" onclick="clearHistory()" style="font-size:9px; padding:4px 12px;">EFFACER</button>
+        </div>
+        <div class="history-list" id="history-list">
+          <div class="empty-history">Aucune requête pour l'instant.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- #app -->
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   ÉTAT
+═══════════════════════════════════════════════════ */
+const state = {
+  serialConnected: false,
+  cReady:          false,
+  lang:            'fr',
+  currentDir:      null,
+  history:         [],
+};
+
+/* ═══════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════ */
+async function api(method, url, body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(url, opts);
+  return r.json().catch(() => ({}));
+}
+
+function toast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ''; }, 3200);
+}
+
+function setLastCmd(cmd) {
+  document.getElementById('last-cmd-code').textContent = cmd;
+}
+
+function now() {
+  return new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+/* ═══════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════ */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ═══════════════════════════════════════════════════
+   STATUS POLLING
+═══════════════════════════════════════════════════ */
+async function refreshStatus() {
+  try {
+    const s = await api('GET', '/api/status');
+
+    state.serialConnected = s.serial_connected;
+    const dotS = document.getElementById('dot-serial');
+    dotS.className = 'dot ' + (s.serial_connected ? 'on' : 'off');
+    document.getElementById('lbl-serial').textContent =
+      s.serial_connected ? `SÉRIE · ${s.serial_port}` : 'SÉRIE · DÉCONNECTÉ';
+    const btn = document.getElementById('btn-connect');
+    btn.textContent    = s.serial_connected ? 'DÉCONNECTER' : 'CONNECTER';
+    btn.className      = s.serial_connected ? 'btn danger' : 'btn primary';
+
+    const sel = document.getElementById('port-select');
+    const cur = sel.value;
+    sel.innerHTML = '';
+    (s.available_ports || []).forEach(p => {
+      const o = document.createElement('option');
+      o.value = o.textContent = p;
+      if (p === cur) o.selected = true;
+      sel.appendChild(o);
+    });
+
+    state.cReady = s.c_program_ready;
+    document.getElementById('dot-c').className = 'dot ' + (state.cReady ? 'on' : 'warn');
+    document.getElementById('lbl-c').textContent = state.cReady ? 'MOTEUR C · OK' : 'MOTEUR C · ABSENT';
+
+  } catch (_) {}
+}
+
+setInterval(refreshStatus, 4000);
+refreshStatus();
+
+/* ═══════════════════════════════════════════════════
+   CONNEXION SÉRIE
+═══════════════════════════════════════════════════ */
+async function toggleSerial() {
+  if (state.serialConnected) {
+    await api('POST', '/api/disconnect');
+    toast('Port série fermé', 'warn');
+  } else {
+    const port = document.getElementById('port-select').value;
+    const r = await api('POST', '/api/connect', { port });
+    toast(r.success ? `Connecté · ${port}` : r.error, r.success ? 'ok' : 'err');
+  }
+  await refreshStatus();
+}
+
+/* ═══════════════════════════════════════════════════
+   MODE MANUEL — D-PAD
+═══════════════════════════════════════════════════ */
+function ev(event, dir) { event.preventDefault(); startMove(dir); }
+
+function startMove(dir) {
+  if (state.currentDir === dir) return;
+  state.currentDir = dir;
+  document.querySelectorAll('.dpad-btn').forEach(b => b.classList.remove('pressed'));
+  const btn = document.getElementById(`btn-${dir}`);
+  if (btn) btn.classList.add('pressed');
+  api('POST', '/api/move', { direction: dir, mode: 'hold' }).then(r => {
+    if (r.sent) setLastCmd(r.sent);
+    if (!r.success) toast('Série non connectée', 'err');
+  });
+}
+
+function stopMove() {
+  if (!state.currentDir) return;
+  state.currentDir = null;
+  document.querySelectorAll('.dpad-btn').forEach(b => b.classList.remove('pressed'));
+  api('POST', '/api/move', { direction: 'stop' }).then(r => { if (r.sent) setLastCmd(r.sent); });
+}
+
+function sendStop() {
+  state.currentDir = null;
+  document.querySelectorAll('.dpad-btn').forEach(b => b.classList.remove('pressed'));
+  api('POST', '/api/move', { direction: 'stop' }).then(r => { if (r.sent) setLastCmd(r.sent); });
+}
+
+document.addEventListener('mouseleave', () => { if (state.currentDir) stopMove(); });
+document.addEventListener('mouseup',    () => { if (state.currentDir) stopMove(); });
+
+/* Raccourcis clavier */
+const KEY_MAP = {
+  'ArrowUp': 'forward', 'z': 'forward', 'Z': 'forward',
+  'ArrowDown': 'backward', 's': 'backward', 'S': 'backward',
+  'ArrowLeft': 'left', 'q': 'left', 'Q': 'left',
+  'ArrowRight': 'right', 'd': 'right', 'D': 'right',
+  ' ': 'stop', 'Escape': 'stop',
+};
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  const dir = KEY_MAP[e.key];
+  if (!dir) return;
+  e.preventDefault();
+  if (dir === 'stop') sendStop();
+  else startMove(dir);
+});
+document.addEventListener('keyup', e => {
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  const dir = KEY_MAP[e.key];
+  if (dir && dir !== 'stop') stopMove();
+});
+
+/* Commande précise */
+async function sendTimed(dir) {
+  const v = parseFloat(document.getElementById('prec-val').value);
+  if (isNaN(v) || v <= 0) { toast('Saisis une valeur > 0', 'err'); return; }
+  const r = await api('POST', '/api/move', { direction: dir, mode: 'timed', value: v });
+  if (r.sent) setLastCmd(r.sent);
+  toast(r.success ? `→ ${r.sent}` : 'Série non connectée', r.success ? 'ok' : 'err');
+}
+
+/* ═══════════════════════════════════════════════════
+   MODE TEXTE
+═══════════════════════════════════════════════════ */
+function setLang(lang) {
+  state.lang = lang;
+  document.getElementById('lang-fr').classList.toggle('active', lang === 'fr');
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  document.getElementById('examples-fr').style.display = lang === 'fr' ? 'flex' : 'none';
+  document.getElementById('examples-en').style.display = lang === 'en' ? 'flex' : 'none';
+  document.getElementById('phrase-input').placeholder =
+    lang === 'fr'
+      ? 'Ex : avance de 2 mètres puis tourne à droite de 90 degrés…'
+      : 'Ex: move forward 2 meters then turn right 90 degrees…';
+}
+
+function useExample(el) {
+  document.getElementById('phrase-input').value = el.textContent;
+  document.getElementById('phrase-input').focus();
+}
+
+/* Rendu des commandes générées */
+function cmdBadgeClass(action) {
+  const a = action.trim().toLowerCase();
+  if (a === 'forward')  return 'fwd';
+  if (a === 'backward') return 'bwd';
+  if (a === 'left' || a === 'right') return 'turn';
+  if (a === 'stop')     return 'stop';
+  return 'misc';
+}
+function cmdBadgeIcon(action) {
+  const a = action.trim().toLowerCase();
+  if (a === 'forward')  return '↑';
+  if (a === 'backward') return '↓';
+  if (a === 'left')     return '←';
+  if (a === 'right')    return '→';
+  if (a === 'stop')     return '■';
+  return '▸';
+}
+
+function renderCommands(commands) {
+  const list = document.getElementById('cmd-list');
+  list.innerHTML = '';
+  if (!commands || commands.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted); font-size:12px; padding:8px 0;">Aucune commande générée — vérifiez la phrase.</div>';
+    return;
+  }
+  commands.forEach(({ cmd, sent }) => {
+    const parts  = cmd.trim().split(/\s+/);
+    const action = parts[0] || '';
+    const value  = parts.slice(1).join(' ');
+    const item = document.createElement('div');
+    item.className = 'cmd-item';
+    const statusHtml = sent === true
+      ? '<span class="cmd-status ok">✓ ENVOYÉ</span>'
+      : sent === false
+        ? '<span class="cmd-status nok">✗ ÉCHEC</span>'
+        : '<span class="cmd-status skip">— NON ENVOYÉ</span>';
+    item.innerHTML = `
+      <div class="cmd-badge ${cmdBadgeClass(action)}">${cmdBadgeIcon(action)}</div>
+      <div class="cmd-text">
+        <span class="cmd-action">${action}</span>
+        <span class="cmd-value">${value}</span>
+      </div>
+      ${statusHtml}
+    `;
+    list.appendChild(item);
+  });
+}
+
+async function sendTextRequest() {
+  const phrase = document.getElementById('phrase-input').value.trim();
+  if (!phrase) { toast('Saisis une phrase', 'warn'); return; }
+  const doSend = document.getElementById('chk-send').checked;
+  const btn     = document.getElementById('btn-send');
+  const spinner = document.getElementById('spinner');
+  btn.disabled  = true;
+  spinner.classList.add('active');
+
+  try {
+    const result = await api('POST', '/api/text-request', {
+      phrase, lang: state.lang, send: doSend,
+    });
+    const panel = document.getElementById('results-panel');
+    panel.classList.add('visible');
+    document.getElementById('c-output').textContent = result.output || '(pas de sortie)';
+
+    if (!result.success) {
+      document.getElementById('cmd-list').innerHTML =
+        `<div style="color:var(--accent2); font-size:12px;">${result.error}</div>`;
+      toast(result.error, 'err');
+    } else {
+      renderCommands(result.commands || []);
+      const sent  = (result.commands || []).filter(c => c.sent === true).length;
+      const total = (result.commands || []).length;
+      if (total === 0) toast('Aucune commande reconnue', 'warn');
+      else if (doSend) toast(`${sent}/${total} commande(s) envoyée(s)`, sent === total ? 'ok' : 'warn');
+      else toast(`${total} commande(s) générée(s)`, 'ok');
+      addHistory(phrase, result.commands || [], state.lang);
+    }
+  } catch (e) {
+    toast('Erreur réseau', 'err');
+  } finally {
+    btn.disabled = false;
+    spinner.classList.remove('active');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('phrase-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) sendTextRequest();
+  });
+});
+
+/* Historique */
+function addHistory(phrase, commands, lang) {
+  state.history.unshift({ time: now(), phrase, commands, lang });
+  if (state.history.length > 30) state.history.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (state.history.length === 0) {
+    list.innerHTML = '<div class="empty-history">Aucune requête pour l\'instant.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  state.history.forEach((entry, idx) => {
+    const total = entry.commands.length;
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.onclick = () => replayHistory(idx);
+    item.innerHTML = `
+      <span class="history-time">${entry.time}</span>
+      <span class="history-phrase">${entry.phrase}</span>
+      <span class="history-count">${total} cmd · ${entry.lang.toUpperCase()}</span>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function replayHistory(idx) {
+  const entry = state.history[idx];
+  if (!entry) return;
+  setLang(entry.lang);
+  document.getElementById('phrase-input').value = entry.phrase;
+  toast('Requête chargée — cliquez sur Analyser', 'ok');
+}
+
+function clearHistory() {
+  state.history = [];
+  renderHistory();
+}
+</script>
+</body>
+</html>
