@@ -10,30 +10,25 @@ Protocole série (robot_arduino_improved.ino) :
   "left <degrees>\\n"     → tourner à gauche
   "stop 0\\n"             → arrêt immédiat
 
-Moteur de requêtes texte (text_engine) :
+Moteur de requêtes texte (TEXT_ENGINE) :
   Le programme C (pfr_text.out) lit UNE phrase sur stdin et exporte les
   commandes dans commands.txt (même format que le protocole série).
   Le backend lit ce fichier et envoie les commandes à l'Arduino.
 
-  ⚠️  Chemins à adapter si nécessaire :
-    - TEXT_ENGINE_DIR : dossier contenant pfr_text.out, lexique_*.txt…
-    - COMMANDS_FILE   : chemin du commands.txt écrit par export_commands()
-                        (hardcodé dans text_request.c comme /home/ny_aina/commands.txt)
-    - CONFIG_LANG_FILE: config_lang.txt lu par load_configuration()
-
 Structure attendue :
-  robot/
+  Windows :  D:\\PFR\\PFR_G5_Upssitech\\PFR2\\INTERFACE\\
   ├── app.py                  ← ce fichier
-  ├── templates/
-  │   └── index.html
-  └── text_engine/
-      ├── pfr_text.out        ← exécutable compilé (make)
-      ├── lexique_fr.txt
-      ├── lexique_en.txt
-      ├── config_lang.txt
-      └── commands.txt        ← généré par le programme C
+  └── templates/
+      └── index.html
 
-Lancement : python3 app.py
+  WSL (Linux) : /mnt/d/PFR/PFR_G5_Upssitech/PFR2/TEXT_ENGINE/
+  ├── pfr_text.out        ← exécutable compilé (make)
+  ├── lexique_fr.txt
+  ├── lexique_en.txt
+  ├── config_lang.txt
+  └── commands.txt        ← généré par le programme C (même fichier vu des deux côtés)
+
+Lancement : python app.py  (depuis Windows, PowerShell ou CMD)
 """
 
 import os
@@ -57,24 +52,22 @@ SERIAL_PORT = os.environ.get("ROBOT_PORT", "/dev/ttyUSB0")
 SERIAL_BAUD = 115200
 
 # ═══════════════════════════════════════════════════
-#  CONFIGURATION TEXT ENGINE
+#  CONFIGURATION TEXT ENGINE (WSL)
 # ═══════════════════════════════════════════════════
 
-# Dossier racine du projet text_engine (contient pfr_text.out, lexique_*.txt…)
-TEXT_ENGINE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "text_engine")
+# Chemin Linux (WSL) vers le dossier TEXT_ENGINE de PFR2
+WSL_TEXT_ENGINE_DIR = "/mnt/d/PFR/PFR_G5_Upssitech/PFR2/TEXT_ENGINE"
 
-# Exécutable compilé (make dans text_engine/ génère pfr_text.out)
-C_PROGRAM_PATH  = os.path.join(TEXT_ENGINE_DIR, "pfr_text.out")
+# Exécutable compilé côté WSL
+WSL_C_PROGRAM_PATH = f"{WSL_TEXT_ENGINE_DIR}/pfr_text.out"
 
-# Fichier de sortie écrit par export_commands() dans text_request.c
-# ⚠️  Actuellement hardcodé dans le source C : /home/ny_aina/commands.txt
-#     Option A — Recompiler le C avec le chemin ci-dessous
-#     Option B — Créer un lien symbolique :
-#       ln -s <COMMANDS_FILE> /home/ny_aina/commands.txt
-COMMANDS_FILE    = os.path.join(TEXT_ENGINE_DIR, "commands.txt")
+# config_lang.txt — accessible depuis Windows ET WSL (même fichier physique)
+WSL_CONFIG_LANG_FILE = f"{WSL_TEXT_ENGINE_DIR}/config_lang.txt"
+WIN_CONFIG_LANG_FILE = r"D:\PFR\PFR_G5_Upssitech\PFR2\TEXT_ENGINE\config_lang.txt"
 
-# Fichier de langue lu par load_configuration() dans config.c
-CONFIG_LANG_FILE = os.path.join(TEXT_ENGINE_DIR, "config_lang.txt")
+# commands.txt — écrit par le programme C dans TEXT_ENGINE, lisible depuis Windows ET WSL
+WSL_COMMANDS_FILE = f"{WSL_TEXT_ENGINE_DIR}/commands.txt"
+WIN_COMMANDS_FILE = r"D:\PFR\PFR_G5_Upssitech\PFR2\TEXT_ENGINE\commands.txt"
 
 # Délai entre deux commandes série envoyées en séquence (secondes)
 INTER_CMD_DELAY = 0.05
@@ -148,41 +141,82 @@ def build_cmd(direction: str, value: float) -> str:
 
 
 # ═══════════════════════════════════════════════════
-#  HELPERS TEXT ENGINE
+#  HELPERS TEXT ENGINE (via WSL)
 # ═══════════════════════════════════════════════════
+
+def wsl_file_exists(wsl_path: str) -> bool:
+    """Vérifie qu'un fichier existe dans WSL sans passer par os.path."""
+    try:
+        check = subprocess.run(
+            ["wsl.exe", "-e", "bash", "-c", f"test -f '{wsl_path}' && echo ok"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        return check.stdout.strip() == "ok"
+    except Exception:
+        return False
+
 
 def set_language(lang: str) -> None:
     """
-    Écrit la langue dans config_lang.txt avant de lancer le programme C.
-    lang : "fr" ou "en"
+    Écrit la langue dans config_lang.txt.
+    lang : "fr" (langue=1) ou "en" (langue=2)
+    Le fichier est dans TEXT_ENGINE, accessible depuis Windows et WSL.
     """
     lang = lang if lang in ("fr", "en") else "fr"
     try:
-        with open(CONFIG_LANG_FILE, "w", encoding="utf-8") as f:
+        with open(WIN_CONFIG_LANG_FILE, "w", encoding="utf-8") as f:
             f.write(f"language={lang}\n")
     except OSError as e:
         print(f"[CONFIG] Impossible d'écrire config_lang.txt : {e}")
 
 
+def delete_old_commands() -> None:
+    """Supprime l'ancien commands.txt pour éviter les résidus."""
+    # Via Windows (accès direct au fichier partagé)
+    try:
+        os.remove(WIN_COMMANDS_FILE)
+    except FileNotFoundError:
+        pass
+    except OSError as e:
+        print(f"[CMD FILE] Impossible de supprimer : {e}")
+
+
 def read_commands_file() -> list[str]:
     """
-    Lit le fichier commands.txt généré par le programme C.
+    Lit commands.txt généré par le programme C.
+    Le fichier est dans TEXT_ENGINE — accessible directement depuis Windows.
     Retourne une liste de lignes valides ex: ["forward 2.00", "right 90.00"].
     """
-    # Essai 1 : chemin local (text_engine/commands.txt)
-    for path in [COMMANDS_FILE, "/home/ny_aina/commands.txt"]:
-        if os.path.isfile(path):
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    return [l.strip() for l in f if l.strip()]
-            except OSError as e:
-                print(f"[CMD FILE] Erreur lecture {path} : {e}")
+    # Lecture directe via Windows (chemin partagé avec WSL)
+    if os.path.isfile(WIN_COMMANDS_FILE):
+        try:
+            with open(WIN_COMMANDS_FILE, "r", encoding="utf-8") as f:
+                return [l.strip() for l in f if l.strip()]
+        except OSError as e:
+            print(f"[CMD FILE] Erreur lecture : {e}")
+
+    # Fallback via WSL
+    try:
+        result = subprocess.run(
+            ["wsl.exe", "-e", "bash", "-c", f"cat '{WSL_COMMANDS_FILE}' 2>/dev/null"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=5,
+        )
+        if result.stdout.strip():
+            return [l.strip() for l in result.stdout.splitlines() if l.strip()]
+    except Exception as e:
+        print(f"[CMD FILE] Erreur lecture WSL : {e}")
+
     return []
 
 
 def run_text_engine(phrase: str, lang: str) -> dict:
     """
-    Lance pfr_text.out pour traiter une phrase en langage naturel.
+    Lance pfr_text.out (via WSL) pour traiter une phrase en langage naturel.
 
     Retourne :
     {
@@ -192,36 +226,33 @@ def run_text_engine(phrase: str, lang: str) -> dict:
         "error":    str | None
     }
     """
-    if not os.path.isfile(C_PROGRAM_PATH):
+    # 1. Vérifier que l'exécutable existe dans WSL
+    if not wsl_file_exists(WSL_C_PROGRAM_PATH):
         return {
             "success": False,
             "output":  "",
             "commands": [],
             "error": (
-                f"Exécutable introuvable : {C_PROGRAM_PATH}\n"
-                f"Lancez 'make' dans le dossier text_engine/"
+                f"Exécutable introuvable dans WSL : {WSL_C_PROGRAM_PATH}\n"
+                f"Lancez 'make' dans le dossier text_engine/ sous WSL."
             )
         }
 
-    # 1. Langue
+    # 2. Langue
     set_language(lang)
 
-    # 2. Supprimer l'ancien commands.txt pour éviter les résidus
-    for path in [COMMANDS_FILE, "/home/ny_aina/commands.txt"]:
-        try:
-            os.remove(path)
-        except FileNotFoundError:
-            pass
+    # 3. Supprimer l'ancien commands.txt
+    delete_old_commands()
 
-    # 3. Lancer le programme C (stdin → phrase)
+    # 4. Lancer le programme C via WSL
+    bash_cmd = f"cd '{WSL_TEXT_ENGINE_DIR}' && '{WSL_C_PROGRAM_PATH}'"
     try:
         result = subprocess.run(
-            [C_PROGRAM_PATH],
+            ["wsl.exe", "-e", "bash", "-c", bash_cmd],
             input=f"{phrase}\n",
             capture_output=True,
             text=True,
             timeout=10,
-            cwd=TEXT_ENGINE_DIR,   # Les lexiques sont chargés en chemin relatif
         )
         stdout = result.stdout.strip()
         stderr = result.stderr.strip()
@@ -250,7 +281,7 @@ def run_text_engine(phrase: str, lang: str) -> dict:
             "error": str(e)
         }
 
-    # 4. Lire les commandes générées
+    # 5. Lire les commandes générées
     commands = read_commands_file()
 
     return {
@@ -291,7 +322,7 @@ def api_status():
         "serial_connected": serial_is_connected(),
         "serial_port":      SERIAL_PORT,
         "available_ports":  ports,
-        "c_program_ready":  os.path.isfile(C_PROGRAM_PATH),
+        "c_program_ready":  wsl_file_exists(WSL_C_PROGRAM_PATH),
     })
 
 
@@ -360,7 +391,7 @@ def api_move():
 @app.route("/api/text-request", methods=["POST"])
 def api_text_request():
     """
-    Traite une phrase en langage naturel via le moteur C.
+    Traite une phrase en langage naturel via le moteur C (WSL).
 
     Body JSON :
       {
@@ -387,7 +418,7 @@ def api_text_request():
     if not phrase:
         return jsonify({"success": False, "error": "Phrase vide", "commands": []}), 400
 
-    # Lancer le moteur C
+    # Lancer le moteur C via WSL
     result = run_text_engine(phrase, lang)
 
     if not result["success"]:
@@ -409,11 +440,11 @@ def api_text_request():
 if __name__ == "__main__":
     print("=" * 60)
     print("  Interface Robot — Serveur Flask")
-    print(f"  Port série    : {SERIAL_PORT}  |  Baud : {SERIAL_BAUD}")
-    print(f"  Moteur C      : {C_PROGRAM_PATH}")
-    print(f"  commands.txt  : {COMMANDS_FILE}")
-    print(f"  Config langue : {CONFIG_LANG_FILE}")
-    print("  URL           : http://<IP_du_Pi>:5000")
+    print(f"  Port série      : {SERIAL_PORT}  |  Baud : {SERIAL_BAUD}")
+    print(f"  Moteur C (WSL)  : {WSL_C_PROGRAM_PATH}")
+    print(f"  commands.txt    : {WIN_COMMANDS_FILE}")
+    print(f"  Config langue   : {WIN_CONFIG_LANG_FILE}")
+    print("  URL             : http://localhost:5000")
     print("=" * 60)
 
     # Tentative de connexion automatique au démarrage
