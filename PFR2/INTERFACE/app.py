@@ -246,6 +246,7 @@ def run_text_engine(phrase: str, lang: str) -> dict:
 
     # 4. Lancer le programme C via WSL
     bash_cmd = f"cd '{WSL_TEXT_ENGINE_DIR}' && '{WSL_C_PROGRAM_PATH}'"
+    print(f"[DEBUG] Phrase envoyée : {repr(phrase)}")
     try:
         result = subprocess.run(
             ["wsl.exe", "-e", "bash", "-c", bash_cmd],
@@ -467,6 +468,6 @@ if __name__ == "__main__":
     print("=" * 60)
 
     # Tentative de connexion automatique au démarrage
-    serial_connect(SERIAL_PORT)
+    
 
     app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)

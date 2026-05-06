@@ -14,7 +14,9 @@ Description :   Récupération des instructions données par
 #include "config.h"
 #include "text_request.h"
 
-#define COMMANDS_FILE "/mnt/d/PFR/PFR_G5_Upssitech/PFR2/TEXT_ENGINE/commands.txt"
+/* Chemin WSL vers le dossier TEXT_ENGINE (lecteur D: monté sous /mnt/d) */
+#define TEXT_ENGINE_DIR "/mnt/c/Users/anton/OneDrive/Documents/Travail/UPSSITECH/3A/PFR/PFR_G5_Upssitech/PFR2/TEXT_ENGINE"
+#define COMMANDS_FILE   TEXT_ENGINE_DIR "/commands.txt"
 
 static void export_commands(const char *filename,
                             command_t cmds[],
