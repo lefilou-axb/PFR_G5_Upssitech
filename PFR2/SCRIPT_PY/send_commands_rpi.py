@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 # Configuration
-ARDUINO_PORT = 'COM3'  # À adapter si différent (ttyUSB0, ttyUSB1, etc.)
+ARDUINO_PORT = '/dev/ttyACM0'  # À adapter si différent (ttyUSB0, ttyUSB1, etc.)
 BAUD_RATE = 115200
 COMMANDS_FILE = 'commands.txt'  # Chemin du fichier de commandes
 
