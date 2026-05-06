@@ -292,17 +292,36 @@ def run_text_engine(phrase: str, lang: str) -> dict:
     }
 
 
+def estimate_duration(cmd_str: str) -> float:
+    """Estime la durée d'exécution d'une commande en secondes."""
+    parts = cmd_str.strip().split()
+    if len(parts) < 2:
+        return 0.5
+    action = parts[0]
+    try:
+        value = float(parts[1])
+    except ValueError:
+        return 0.5
+
+    # ⚠️ Ajustez ces vitesses selon votre robot
+    SPEED_M_PER_S  = 0.4   # vitesse en ligne droite (m/s)
+    SPEED_DEG_PER_S = 180.0  # vitesse de rotation (degrés/s)
+
+    if action in ("forward", "backward"):
+        return (value / SPEED_M_PER_S) + 0.3   # +0.3s de marge
+    elif action in ("left", "right"):
+        return (value / SPEED_DEG_PER_S) + 0.3
+    return 0.5
+
 def send_commands_to_arduino(commands: list[str]) -> list[dict]:
-    """
-    Envoie chaque commande de commands.txt sur le port série.
-    Retourne la liste des commandes avec leur statut d'envoi.
-    """
     results = []
     for cmd_str in commands:
         ok = serial_send(cmd_str + "\n")
         results.append({"cmd": cmd_str, "sent": ok})
         if ok:
-            time.sleep(INTER_CMD_DELAY)
+            wait = estimate_duration(cmd_str)
+            print(f"[SERIAL] Attente {wait:.1f}s avant prochaine commande...")
+            time.sleep(wait)
     return results
 
 
