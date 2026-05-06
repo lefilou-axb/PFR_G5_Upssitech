@@ -14,8 +14,7 @@ Description :   Récupération des instructions données par
 #include "config.h"
 #include "text_request.h"
 
-/* Chemin du fichier de commandes exportées (relatif au répertoire d'exécution) */
-#define COMMANDS_FILE "commands.txt"
+#define COMMANDS_FILE "/mnt/d/PFR/PFR_G5_Upssitech/PFR2/TEXT_ENGINE/commands.txt"
 
 static void export_commands(const char *filename,
                             command_t cmds[],
@@ -31,10 +30,6 @@ static void export_commands(const char *filename,
     fclose(file);
 }
 
-/* ---------------------------------------------------------------
- * handle_text_request : saisie clavier → lexer → interpréteur
- * Retourne 1 si des commandes ont été générées, 0 sinon.
- * ------------------------------------------------------------- */
 int handle_text_request(void)
 {
     char input[256];
@@ -48,7 +43,6 @@ int handle_text_request(void)
     int c = interpret_words(words, w, cmds);
 
     if (c == 0) {
-        printf("Aucune commande reconnue.\n");
         return 0;
     }
 
@@ -61,17 +55,16 @@ int handle_text_request(void)
     }
 
     export_commands(COMMANDS_FILE, cmds, c);
-    printf("\nCommandes exportées dans %s\n", COMMANDS_FILE);
+    printf("\nCommandes exportées dans commands.txt\n");
     return 1;
 }
 
 /* ---------------------------------------------------------------
- * handle_vocal_request : lit la transcription depuis un fichier
+ * handle_vocal_request : lit la transcription depuis le fichier
  * écrit par Module_vocal.py, puis applique le même pipeline que
  * handle_text_request (lexer → interpréteur → export).
  *
- * filepath : chemin vers vocal_res.txt (relatif au répertoire
- *            d'exécution de l'IHM, ex. "vocal_res.txt")
+ * filepath : chemin vers vocal_res.txt
  *
  * Retourne 1 si des commandes ont été générées, 0 sinon.
  * ------------------------------------------------------------- */
@@ -81,10 +74,9 @@ int handle_vocal_request(const char *filepath)
     word_t words[MAX_WORDS];
     command_t cmds[MAX_COMMANDS];
 
-    /* Lecture du fichier de transcription */
     FILE *file = fopen(filepath, "r");
     if (!file) {
-        printf("Erreur : impossible de lire le fichier de transcription vocale (%s).\n", filepath);
+        printf("Erreur : impossible de lire la transcription vocale (%s).\n", filepath);
         return 0;
     }
 
@@ -95,12 +87,12 @@ int handle_vocal_request(const char *filepath)
     }
     fclose(file);
 
-    /* Nettoyage du fichier temporaire */
+    /* Suppression du fichier temporaire pour éviter de rejouer
+     * une ancienne transcription lors de la prochaine session  */
     remove(filepath);
 
     printf("Commande vocale transcrite : %s\n", input);
 
-    /* Pipeline identique à handle_text_request */
     int w = lexical_analysis(input, words);
     int c = interpret_words(words, w, cmds);
 
@@ -118,17 +110,13 @@ int handle_vocal_request(const char *filepath)
     }
 
     export_commands(COMMANDS_FILE, cmds, c);
-    printf("\nCommandes exportées dans %s\n", COMMANDS_FILE);
+    printf("\nCommandes exportées dans commands.txt\n");
     return 1;
 }
 
-/* ---------------------------------------------------------------
- * commander_robot : point d'entrée autonome (pilotage textuel
- * avec envoi direct vers le script Windows).
- * ------------------------------------------------------------- */
 void commander_robot(void) {
     if (handle_text_request()) {
-        int ret = system("python3 ../Simulation/readCmd.py");
+        int ret = system("python3 /home/ny_aina/send_commands_WINDOWS.py");
         if (ret != 0) {
             fprintf(stderr, "Erreur lors de l'exécution du script Python\n");
         }

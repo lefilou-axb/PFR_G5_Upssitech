@@ -29,6 +29,15 @@ Description :   Interface utilisateur et administrateur du logiciel
 #include "module_test.h"
 /* =============================================================== */
 
+/* Chemin du fichier de transcription produit par Module_vocal.py  */
+#define VOCAL_RES_FILE   "vocal_res.txt"
+
+/* Chemin relatif vers le script vocal (depuis le répertoire IHM/) */
+#define VOCAL_SCRIPT     "python3 ../Module_vocal/Module_vocal.py"
+
+/* Chemin relatif vers le script de simulation                     */
+#define SIMU_SCRIPT      "python3 ../Simulation/readCmd.py"
+
 /* ================= MENUS ================= */
 void ecran_accueil()
 {
@@ -143,38 +152,16 @@ void pilotage_manuel()
 void pilotage_vocal()
 {
     printf("\n%s\n\n", txt("TITLE_VOICE"));
-    system("python3 ../Module_vocal/Module_vocal.py");
-    
-    // --- Lire le résultat de la transcription ---
-    /*FILE *file = fopen("vocal_res.txt", "r");
-    if (file != NULL) {
-        char buffer[256];
-        if (fgets(buffer, sizeof(buffer), file)) {
-            printf("Traitement de la commande vocale : %s\n", buffer);
-            
-            word_t words[255];
-            command_t cmds[255];
 
-            int w = lexical_analysis(buffer, words);
-            int c = interpret_words(words, w, cmds);
-            
-            // Export pour la simulation
-            export_commands("commands.txt", cmds, c); 
-            
-            printf("\n%s\n", txt("REQUEST_EXP"));
-            
-            // Lancer la simulation (comme dans pilotage_textuel)
-            system("python3 ../Simulation/readCmd.py");
-        }
-        fclose(file);
-        remove("vocal_res.txt"); // Nettoyage
-    } else {
-        printf("Erreur : Impossible de récupérer la commande vocale.\n");
-    }*/
+    /* 1. Lancer le module vocal : écoute micro et écrit vocal_res.txt */
+    system(VOCAL_SCRIPT);
 
-    /*if (handle_text_request()) {
-        system("python3 ../Simulation/readCmd.py");
-    }*/
+    /* 2. Lire la transcription, l'analyser et exporter les commandes  */
+    if (handle_vocal_request(VOCAL_RES_FILE)) {
+
+        /* 3. Lancer la simulation avec les commandes générées          */
+        system(SIMU_SCRIPT);
+    }
 
     menu_pilotage_robot();
 }
@@ -185,11 +172,10 @@ void pilotage_textuel()
     printf("\n%s\n", txt("REQUEST_MSG"));
 
     if (handle_text_request()) {
-        system("python3 ../Simulation/readCmd.py");
+        system(SIMU_SCRIPT);
     }
     
     menu_pilotage_robot();
-
 }
 
 
