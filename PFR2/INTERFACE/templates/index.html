@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ROBOT CONTROL</title>
+  <title>ROBOT MOBILE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
@@ -388,7 +388,7 @@
   <!-- ══════════ HEADER ══════════ -->
   <header>
     <div class="logo-group">
-      <div class="logo">ROBOT<em>.</em>CTL</div>
+      <div class="logo">ROBOT<em>.</em>MOBILE</div>
       <span class="build-tag">v1.0 · Pi 3B</span>
     </div>
     <div class="status-bar">
@@ -410,7 +410,7 @@
   <!-- ══════════ TABS ══════════ -->
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('manual', this)">◈ MANUEL</button>
-    <button class="tab-btn"        onclick="switchTab('text',   this)">◈ TEXTE</button>
+    <button class="tab-btn"        onclick="switchTab('text',   this)">◈ REQUÊTES</button>
   </div>
 
   <!-- ══════════════════════════════════
@@ -436,7 +436,7 @@
             <div class="dpad-btn" id="btn-left"
                  onmousedown="startMove('left')" onmouseup="stopMove()"
                  ontouchstart="ev(event,'left')" ontouchend="stopMove()">
-              <svg viewBox="0 0 24 24"><path d="M20 12l-9-8v5H4v6h7v5z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M4 12l9 8v-5h7v-6h-7V4z"/></svg>
               <span>LEFT</span>
             </div>
             <div class="dpad-btn dpad-stop" onclick="sendStop()">
@@ -446,7 +446,7 @@
             <div class="dpad-btn" id="btn-right"
                  onmousedown="startMove('right')" onmouseup="stopMove()"
                  ontouchstart="ev(event,'right')" ontouchend="stopMove()">
-              <svg viewBox="0 0 24 24"><path d="M4 12l9 8v-5h7v-6h-7V4z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M20 12l-9-8v5H4v6h7v5z"/></svg>
               <span>RIGHT</span>
             </div>
 

@@ -14,14 +14,9 @@ Description :   Récupération des instructions données par
 #include "config.h"
 #include "text_request.h"
 
-/*
- * ⚠  CHEMIN MODIFIÉ POUR LA RASPBERRY PI
- *    Ancienne valeur (Windows/WSL) :
- *      "/mnt/d/PFR/PFR_G5_Upssitech/PFR2/TEXT_ENGINE/commands.txt"
- *    Nouvelle valeur (Pi natif) :
- *      "/home/groupe5/Documents/PFR/TEXT_ENGINE/commands.txt"
- */
-#define COMMANDS_FILE "/home/groupe5/Documents/PFR/TEXT_ENGINE/commands.txt"
+/* Chemin WSL vers le dossier TEXT_ENGINE (lecteur D: monté sous /mnt/d) */
+#define TEXT_ENGINE_DIR "/mnt/c/Users/anton/OneDrive/Documents/Travail/UPSSITECH/3A/PFR/PFR_G5_Upssitech/PFR2/TEXT_ENGINE"
+#define COMMANDS_FILE   TEXT_ENGINE_DIR "/commands.txt"
 
 static void export_commands(const char *filename,
                             command_t cmds[],
@@ -121,22 +116,8 @@ int handle_vocal_request(const char *filepath)
     return 1;
 }
 
-/*
- * commander_robot — NON APPELÉE PAR FLASK
- * ----------------------------------------
- * Flask appelle directement handle_text_request() via pfr_text.out
- * et gère lui-même l'envoi série. Le system() ci-dessous échouera
- * silencieusement si main.c appelle cette fonction, mais commands.txt
- * sera quand même généré correctement.
- *
- * Pour éviter le message d'erreur, tu peux modifier main.c pour
- * appeler handle_text_request() directement.
- */
 void commander_robot(void) {
     if (handle_text_request()) {
-        /* Le script Python d'origine est remplacé par Flask côté interface.
-         * Cette ligne est conservée pour compatibilité mais n'est pas utilisée
-         * quand le programme est lancé depuis l'interface web. */
         int ret = system("python3 /home/ny_aina/send_commands_WINDOWS.py");
         if (ret != 0) {
             fprintf(stderr, "Erreur lors de l'exécution du script Python\n");
