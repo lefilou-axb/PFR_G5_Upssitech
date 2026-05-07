@@ -1,0 +1,2 @@
+cd /home/groupe5/Documents/PFR/INTERFACE
+python3 app.py

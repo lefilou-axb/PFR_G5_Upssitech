@@ -14,8 +14,8 @@
 #define ECHO3 38
 
 // ==================== CALIBRATION - À MODIFIER PAR VOS TESTS ====================
-#define DISTANCE_RATIO 0.0008  // À CALIBRER : mètres par milliseconde
-#define ANGLE_RATIO 0.09       // À CALIBRER : degrés par milliseconde
+#define DISTANCE_RATIO 0.0007  // À CALIBRER : mètres par milliseconde
+#define ANGLE_RATIO 0.038       // À CALIBRER : degrés par milliseconde
 #define OBSTACLE_DISTANCE 30.0 // Distance minimale avant arrêt (cm)
 
 // ==================== MOTEURS ====================
