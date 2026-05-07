@@ -378,6 +378,35 @@
     #toast.err  { border-color: var(--accent2); color: var(--accent2); }
     #toast.warn { border-color: var(--accent); color: var(--accent-dark); }
 
+    /* ── MIC BUTTON ── */
+    .btn-mic {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface2); color: var(--primary);
+      transition: all .2s; flex-shrink: 0;
+    }
+    .btn-mic:hover { background: var(--border); }
+    .btn-mic.listening {
+      background: var(--accent2); color: var(--surface);
+      animation: pulse-mic 1s ease-in-out infinite;
+    }
+    .btn-mic svg { width: 20px; height: 20px; fill: currentColor; }
+    @keyframes pulse-mic {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(227, 76, 55, 0.4); }
+      50%       { box-shadow: 0 0 0 10px rgba(227, 76, 55, 0); }
+    }
+
+    /* Transcription affichée sous le textarea */
+    .transcription-box {
+      display: none; margin-top: 8px;
+      padding: 10px 14px; border-radius: var(--r);
+      background: var(--surface2); border: 1px solid var(--border);
+      font-size: 12px; color: var(--muted); font-style: italic;
+    }
+    .transcription-box.visible { display: block; }
+    .transcription-box strong { color: var(--primary); font-style: normal; }
+
     /* Right column stack */
     .right-col { display: flex; flex-direction: column; gap: 20px; }
   </style>
@@ -556,12 +585,19 @@
             <input type="checkbox" id="chk-send" checked />
             Envoyer à l'Arduino après analyse
           </label>
-          <div style="display:flex; align-items:center; gap:12px;">
+          <div style="display:flex; align-items:center; gap:10px;">
             <div class="spinner" id="spinner"></div>
+            <button class="btn-mic" id="btn-mic" onclick="startVocalRequest()" title="Commande vocale">
+              <svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V20H9v2h6v-2h-2v-2.07A7 7 0 0 0 19 11h-2z"/></svg>
+            </button>
             <button class="btn big primary" id="btn-send" onclick="sendTextRequest()">
               ▶ ANALYSER
             </button>
           </div>
+        </div>
+
+        <div class="transcription-box" id="transcription-box">
+          🎙️ Transcription : <strong id="transcription-text"></strong>
         </div>
       </div>
 
@@ -782,6 +818,89 @@ async function sendTimed(dir) {
   const r = await api('POST', '/api/move', { direction: dir, mode: 'timed', value: v });
   if (r.sent) setLastCmd(r.sent);
   toast(r.success ? `→ ${r.sent}` : 'Série non connectée', r.success ? 'ok' : 'err');
+}
+
+/* ═══════════════════════════════════════════════════
+   MODE VOCAL — Web Speech API (navigateur)
+   La transcription se fait entièrement côté navigateur
+   (Chrome / Edge). Aucun appel réseau pendant l'écoute.
+   Une fois la phrase reconnue, elle est injectée dans le
+   textarea et soumise exactement comme sendTextRequest().
+═══════════════════════════════════════════════════ */
+let _recognition = null;   // instance SpeechRecognition active
+
+function startVocalRequest() {
+  const btn       = document.getElementById('btn-mic');
+  const transBox  = document.getElementById('transcription-box');
+  const transText = document.getElementById('transcription-text');
+
+  // ── Si déjà en écoute : stopper ──
+  if (btn.classList.contains('listening')) {
+    if (_recognition) _recognition.stop();
+    btn.classList.remove('listening');
+    transBox.classList.remove('visible');
+    toast('Écoute annulée', 'warn');
+    return;
+  }
+
+  // ── Vérifier le support navigateur ──
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    toast('Reconnaissance vocale non supportée — utilisez Chrome ou Edge', 'err');
+    return;
+  }
+
+  // ── Démarrer la reconnaissance ──
+  const recog = new SpeechRecognition();
+  recog.lang            = (state.lang === 'en') ? 'en-US' : 'fr-FR';
+  recog.interimResults  = false;
+  recog.maxAlternatives = 1;
+  recog.continuous      = false;
+  _recognition = recog;
+
+  btn.classList.add('listening');
+  transBox.classList.remove('visible');
+  toast('🎙️ Écoute en cours… parlez maintenant', 'warn');
+
+  // ── Résultat reçu ──
+  recog.onresult = (event) => {
+    const transcript = event.results[0][0].transcript.trim();
+
+    // Afficher la transcription sous le textarea
+    transText.textContent = transcript;
+    transBox.classList.add('visible');
+
+    // Injecter dans le textarea
+    document.getElementById('phrase-input').value = transcript;
+
+    toast('🎙️ Transcription OK — analyse en cours…', 'ok');
+
+    // Soumettre automatiquement
+    sendTextRequest();
+  };
+
+  // ── Erreurs ──
+  recog.onerror = (event) => {
+    const messages = {
+      'no-speech':     'Aucune parole détectée — réessayez',
+      'not-allowed':   'Accès micro refusé — autorisez le micro dans votre navigateur',
+      'audio-capture': 'Aucun micro trouvé',
+      'network':       'Erreur réseau pour la reconnaissance (Google)',
+      'aborted':       null,   // annulé volontairement, pas de message
+    };
+    const msg = messages[event.error];
+    if (msg) toast(msg, 'err');
+    btn.classList.remove('listening');
+    _recognition = null;
+  };
+
+  // ── Fin d'écoute (même sans résultat) ──
+  recog.onend = () => {
+    btn.classList.remove('listening');
+    _recognition = null;
+  };
+
+  recog.start();
 }
 
 /* ═══════════════════════════════════════════════════

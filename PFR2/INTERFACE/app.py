@@ -463,6 +463,117 @@ def api_text_request():
 
 
 # ═══════════════════════════════════════════════════
+#  ROUTES — MODE VOCAL
+# ═══════════════════════════════════════════════════
+
+VOCAL_RESULT_FILE = os.path.join(TEXT_ENGINE_DIR, "vocal_res.txt")
+
+@app.route("/api/vocal-request", methods=["POST"])
+def api_vocal_request():
+    """
+    Lance l'écoute micro via Module_vocal.py (en sous-processus),
+    récupère la transcription depuis vocal_res.txt,
+    puis la traite comme une requête texte normale.
+
+    Body JSON :
+      {
+        "lang": "fr" | "en",
+        "send": true | false
+      }
+
+    Réponse :
+      {
+        "success":      bool,
+        "transcription": str,
+        "output":       str,
+        "commands":     [{ "cmd": ..., "sent": bool }],
+        "error":        str | null
+      }
+    """
+    data    = request.get_json(silent=True) or {}
+    lang    = data.get("lang", "fr")
+    do_send = data.get("send", True)
+
+    # 1. Supprimer l'ancien fichier de transcription
+    try:
+        os.remove(VOCAL_RESULT_FILE)
+    except FileNotFoundError:
+        pass
+
+    # 2. Lancer Module_vocal.py
+    vocal_script = os.path.join(BASE_DIR, "INTERFACE", "Module_vocal.py")
+    if not os.path.isfile(vocal_script):
+        # Chercher à côté de app.py
+        vocal_script = os.path.join(os.path.dirname(__file__), "Module_vocal.py")
+
+    try:
+        proc = subprocess.run(
+            ["python3", vocal_script],
+            capture_output=True,
+            text=True,
+            timeout=30,          # 30s max pour parler
+            cwd=TEXT_ENGINE_DIR,
+        )
+        print(f"[VOCAL] stdout: {proc.stdout.strip()[:200]}")
+        if proc.stderr:
+            print(f"[VOCAL] stderr: {proc.stderr.strip()[:200]}")
+    except subprocess.TimeoutExpired:
+        return jsonify({
+            "success": False,
+            "transcription": "",
+            "output": "",
+            "commands": [],
+            "error": "Timeout — aucune parole détectée en 30s"
+        }), 500
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "transcription": "",
+            "output": "",
+            "commands": [],
+            "error": str(e)
+        }), 500
+
+    # 3. Lire la transcription depuis vocal_res.txt
+    try:
+        with open(VOCAL_RESULT_FILE, "r", encoding="utf-8") as f:
+            transcription = f.read().strip()
+    except FileNotFoundError:
+        return jsonify({
+            "success": False,
+            "transcription": "",
+            "output": proc.stdout.strip(),
+            "commands": [],
+            "error": "Transcription non trouvée — parole non reconnue ?"
+        }), 500
+
+    if not transcription:
+        return jsonify({
+            "success": False,
+            "transcription": "",
+            "output": proc.stdout.strip(),
+            "commands": [],
+            "error": "Transcription vide"
+        }), 500
+
+    print(f"[VOCAL] Transcription : {transcription}")
+
+    # 4. Traiter la transcription comme une requête texte
+    result = run_text_engine(transcription, lang)
+    result["transcription"] = transcription
+
+    if not result["success"]:
+        return jsonify(result), 500
+
+    if do_send and result["commands"]:
+        result["commands"] = send_commands_to_arduino(result["commands"])
+    else:
+        result["commands"] = [{"cmd": c, "sent": False} for c in result["commands"]]
+
+    return jsonify(result)
+
+
+# ═══════════════════════════════════════════════════
 #  POINT D'ENTRÉE
 # ═══════════════════════════════════════════════════
 
