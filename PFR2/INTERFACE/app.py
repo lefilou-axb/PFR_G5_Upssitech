@@ -71,6 +71,44 @@ SPEED_DEG_PER_S = 180.0  # vitesse de rotation (à calibrer)
 serial_conn: serial.Serial | None = None
 serial_lock = threading.Lock()
 
+# ─── État des capteurs ultrason (mis à jour en arrière-plan) ───
+sensor_data: dict = {"s1": None, "s2": None, "s3": None}
+sensor_lock = threading.Lock()
+
+
+def _serial_reader_thread():
+    """
+    Lit en continu le port série et extrait les trames SENSORS:d1:d2:d3.
+    Tourne en daemon thread dès qu'une connexion série est établie.
+    """
+    while True:
+        time.sleep(0.05)
+        with serial_lock:
+            conn = serial_conn
+        if conn is None or not conn.is_open:
+            continue
+        try:
+            if conn.in_waiting:
+                line = conn.readline().decode("utf-8", errors="replace").strip()
+                if line.startswith("SENSORS:"):
+                    parts = line[len("SENSORS:"):].split(":")
+                    if len(parts) == 3:
+                        try:
+                            d1, d2, d3 = float(parts[0]), float(parts[1]), float(parts[2])
+                            with sensor_lock:
+                                sensor_data["s1"] = round(d1, 1)
+                                sensor_data["s2"] = round(d2, 1)
+                                sensor_data["s3"] = round(d3, 1)
+                        except ValueError:
+                            pass
+        except Exception:
+            pass
+
+
+# Lancer le thread de lecture en arrière-plan
+_reader = threading.Thread(target=_serial_reader_thread, daemon=True)
+_reader.start()
+
 
 # ═══════════════════════════════════════════════════
 #  HELPERS SÉRIE
@@ -334,8 +372,15 @@ def api_disconnect():
     return jsonify({"success": True})
 
 
+@app.route("/api/sensors")
+def api_sensors():
+    """Retourne les dernières distances lues par les capteurs ultrason."""
+    with sensor_lock:
+        data = dict(sensor_data)
+    return jsonify(data)
+
+
 # ═══════════════════════════════════════════════════
-#  ROUTES — MODE MANUEL
 # ═══════════════════════════════════════════════════
 
 @app.route("/api/move", methods=["POST"])

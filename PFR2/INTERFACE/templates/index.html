@@ -676,6 +676,36 @@ setInterval(refreshStatus, 4000);
 refreshStatus();
 
 /* ═══════════════════════════════════════════════════
+   CAPTEURS ULTRASON — POLLING
+═══════════════════════════════════════════════════ */
+const ALERT_DIST = 30; // cm — seuil alerte (rouge)
+
+async function refreshSensors() {
+  try {
+    const s = await api('GET', '/api/sensors');
+    updateSensor('tele-s1', 'tele-cell-1', s.s1);
+    updateSensor('tele-s3', 'tele-cell-3', s.s3);
+    updateSensor('tele-s2', 'tele-cell-2', s.s2);
+  } catch (_) {}
+}
+
+function updateSensor(valueId, cellId, val) {
+  const el = document.getElementById(valueId);
+  const cell = document.getElementById(cellId);
+  if (!el || !cell) return;
+  if (val === null || val === undefined) {
+    el.textContent = '—';
+    cell.classList.remove('alert');
+  } else {
+    el.textContent = val.toFixed(1);
+    cell.classList.toggle('alert', val < ALERT_DIST);
+  }
+}
+
+setInterval(refreshSensors, 500);
+refreshSensors();
+
+/* ═══════════════════════════════════════════════════
    CONNEXION SÉRIE
 ═══════════════════════════════════════════════════ */
 async function toggleSerial() {
