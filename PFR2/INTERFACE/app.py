@@ -580,6 +580,68 @@ def api_vocal_request():
 
 
 # ═══════════════════════════════════════════════════
+#  ROUTES — SLAM LIDAR
+# ═══════════════════════════════════════════════════
+
+SLAM_START_SCRIPT = "/home/groupe5/start_slam.sh"
+SLAM_SAVE_SCRIPT  = "/home/groupe5/save_map.sh"
+SLAM_STOP_SCRIPT  = "/home/groupe5/stop_slam.sh"
+
+@app.route("/api/slam/start", methods=["POST"])
+def api_slam_start():
+    """Lance le script start_slam.sh en arrière-plan."""
+    if not os.path.isfile(SLAM_START_SCRIPT):
+        return jsonify({"success": False, "error": f"Script introuvable : {SLAM_START_SCRIPT}"}), 404
+    try:
+        subprocess.Popen(
+            ["bash", SLAM_START_SCRIPT],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/slam/save", methods=["POST"])
+def api_slam_save():
+    """Lance le script save_map.sh et attend sa fin."""
+    if not os.path.isfile(SLAM_SAVE_SCRIPT):
+        return jsonify({"success": False, "error": f"Script introuvable : {SLAM_SAVE_SCRIPT}"}), 404
+    try:
+        result = subprocess.run(
+            ["bash", SLAM_SAVE_SCRIPT],
+            capture_output=True, text=True, timeout=30
+        )
+        if result.returncode == 0:
+            return jsonify({"success": True, "output": result.stdout.strip()})
+        return jsonify({"success": False, "error": result.stderr.strip() or "Erreur inconnue"}), 500
+    except subprocess.TimeoutExpired:
+        return jsonify({"success": False, "error": "Timeout — carte non sauvegardée"}), 500
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/slam/stop", methods=["POST"])
+def api_slam_stop():
+    """Lance le script stop_slam.sh et attend sa fin."""
+    if not os.path.isfile(SLAM_STOP_SCRIPT):
+        return jsonify({"success": False, "error": f"Script introuvable : {SLAM_STOP_SCRIPT}"}), 404
+    try:
+        result = subprocess.run(
+            ["bash", SLAM_STOP_SCRIPT],
+            capture_output=True, text=True, timeout=20
+        )
+        if result.returncode == 0:
+            return jsonify({"success": True, "output": result.stdout.strip()})
+        return jsonify({"success": False, "error": result.stderr.strip() or "Erreur inconnue"}), 500
+    except subprocess.TimeoutExpired:
+        return jsonify({"success": False, "error": "Timeout — arrêt échoué"}), 500
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ═══════════════════════════════════════════════════
 #  ROUTE — CARTE LIDAR
 # ═══════════════════════════════════════════════════
 

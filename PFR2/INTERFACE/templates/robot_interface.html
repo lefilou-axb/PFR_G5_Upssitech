@@ -446,6 +446,12 @@
           <button class="btn" onclick="mapReset()">⊡ RESET</button>
           <button class="btn" onclick="downloadMap()">⬇ TÉLÉCHARGER</button>
         </div>
+        <div class="map-toolbar" style="margin-bottom:0;">
+          <button class="btn primary" id="btn-start-slam" onclick="slamStart()">▶ LANCER SCAN</button>
+          <button class="btn" id="btn-save-map" onclick="slamSave()">📷 CAPTURER CARTE</button>
+          <button class="btn danger" id="btn-stop-slam" onclick="slamStop()">■ ARRÊTER DOCKER</button>
+          <span id="slam-status" style="font-size:11px; font-weight:600; letter-spacing:1px; color:var(--muted); text-transform:uppercase;"></span>
+        </div>
         <div class="map-viewport" id="map-viewport">
           <div class="map-placeholder" id="map-placeholder">
             <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
@@ -724,6 +730,52 @@ async function sendTextRequest() {
     }
   } catch (e) { toast('Erreur réseau', 'err'); }
   finally { btn.disabled = false; spinner.classList.remove('active'); }
+}
+
+/* ── SLAM CONTROLS ── */
+function setSlamStatus(msg, type) {
+  const el = document.getElementById('slam-status');
+  el.textContent = msg;
+  el.style.color = type === 'ok' ? 'var(--accent3)' : type === 'err' ? 'var(--accent2)' : 'var(--muted)';
+}
+
+async function slamStart() {
+  const btn = document.getElementById('btn-start-slam');
+  btn.disabled = true;
+  setSlamStatus('Démarrage en cours…', '');
+  toast('Lancement du SLAM…', 'warn');
+  try {
+    const r = await api('POST', '/api/slam/start');
+    if (r.success) { setSlamStatus('SLAM en cours ✓', 'ok'); toast('SLAM lancé !', 'ok'); }
+    else { setSlamStatus('Erreur démarrage', 'err'); toast(r.error || 'Erreur', 'err'); }
+  } catch (e) { setSlamStatus('Erreur réseau', 'err'); toast('Erreur réseau', 'err'); }
+  finally { btn.disabled = false; }
+}
+
+async function slamSave() {
+  const btn = document.getElementById('btn-save-map');
+  btn.disabled = true;
+  setSlamStatus('Capture en cours…', '');
+  toast('Sauvegarde de la carte…', 'warn');
+  try {
+    const r = await api('POST', '/api/slam/save');
+    if (r.success) { setSlamStatus('Carte sauvegardée ✓', 'ok'); toast('Carte capturée !', 'ok'); loadMap(); }
+    else { setSlamStatus('Erreur capture', 'err'); toast(r.error || 'Erreur', 'err'); }
+  } catch (e) { setSlamStatus('Erreur réseau', 'err'); toast('Erreur réseau', 'err'); }
+  finally { btn.disabled = false; }
+}
+
+async function slamStop() {
+  const btn = document.getElementById('btn-stop-slam');
+  btn.disabled = true;
+  setSlamStatus('Arrêt en cours…', '');
+  toast('Arrêt du Docker…', 'warn');
+  try {
+    const r = await api('POST', '/api/slam/stop');
+    if (r.success) { setSlamStatus('Docker arrêté ✓', 'ok'); toast('Docker arrêté !', 'ok'); }
+    else { setSlamStatus('Erreur arrêt', 'err'); toast(r.error || 'Erreur', 'err'); }
+  } catch (e) { setSlamStatus('Erreur réseau', 'err'); toast('Erreur réseau', 'err'); }
+  finally { btn.disabled = false; }
 }
 
 /* ── CARTE LIDAR ── */
