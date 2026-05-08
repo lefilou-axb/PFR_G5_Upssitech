@@ -8,7 +8,7 @@ Structure attendue sur la Pi :
   ├── INTERFACE/
   │   ├── app.py              ← ce fichier
   │   └── templates/
-  │       └── index.html
+  │       └── robot_interface.html
   └── TEXT_ENGINE/
       ├── pfr_text.out        ← compilé sur la Pi avec make
       ├── lexique_fr.txt
@@ -28,14 +28,17 @@ Lancement :
 Accès depuis le réseau : http://<IP_du_Pi>:5000
 """
 
+import io
 import os
+import struct
 import subprocess
 import threading
 import time
+import zlib
 
 import serial
 import serial.tools.list_ports
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, send_file, Response
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -51,6 +54,9 @@ TEXT_ENGINE_DIR  = os.path.join(BASE_DIR, "TEXT_ENGINE")
 C_PROGRAM_PATH   = os.path.join(TEXT_ENGINE_DIR, "pfr_text.out")
 CONFIG_LANG_FILE = os.path.join(TEXT_ENGINE_DIR, "config_lang.txt")
 COMMANDS_FILE    = os.path.join(TEXT_ENGINE_DIR, "commands.txt")
+
+# Carte LiDAR générée par ROS 2
+MAP_FILE = "/home/groupe5/ros2_ws/ma_carte.pgm"
 
 # ═══════════════════════════════════════════════════
 #  CONFIGURATION SÉRIE
@@ -337,7 +343,7 @@ def send_commands_to_arduino(commands: list[str]) -> list[dict]:
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("robot_interface.html")
 
 
 @app.route("/api/status")
@@ -571,6 +577,120 @@ def api_vocal_request():
         result["commands"] = [{"cmd": c, "sent": False} for c in result["commands"]]
 
     return jsonify(result)
+
+
+# ═══════════════════════════════════════════════════
+#  ROUTE — CARTE LIDAR
+# ═══════════════════════════════════════════════════
+
+def _pgm_to_png_bytes(path: str) -> bytes:
+    """
+    Lit un fichier PGM (P5 binaire ou P2 ASCII) et retourne un PNG en mémoire.
+    Dépendance zéro : utilise uniquement la stdlib Python (struct + zlib).
+    """
+    with open(path, "rb") as f:
+        raw = f.read()
+
+    lines = raw.split(b"\n")
+    idx = 0
+
+    # Sauter les commentaires
+    header = []
+    while len(header) < 3:
+        line = lines[idx].strip()
+        idx += 1
+        if line.startswith(b"#") or not line:
+            continue
+        # Une ligne peut contenir plusieurs tokens
+        header.extend(line.split())
+
+    magic  = header[0].decode()
+    width  = int(header[1])
+    height = int(header[2])
+    maxval = int(header[3]) if len(header) > 3 else 255
+
+    if magic == "P5":
+        # binaire : les pixels viennent après le 3e saut de ligne
+        offset = 0
+        count  = 0
+        for i, b in enumerate(raw):
+            if b == ord("\n"):
+                count += 1
+                if count == 3:
+                    offset = i + 1
+                    break
+        pixels = raw[offset:offset + width * height]
+    elif magic == "P2":
+        vals   = b" ".join(lines[idx:]).split()
+        pixels = bytes([int(v) for v in vals])
+    else:
+        raise ValueError(f"Format PGM non supporté : {magic}")
+
+    # Normaliser si maxval != 255
+    if maxval != 255:
+        pixels = bytes([int(p * 255 / maxval) for p in pixels])
+
+    # Construire le PNG minimal (RGB 8 bits, pas d'entrelacement)
+    def make_chunk(ctype: bytes, data: bytes) -> bytes:
+        c = ctype + data
+        return struct.pack(">I", len(data)) + c + struct.pack(">I", zlib.crc32(c) & 0xFFFFFFFF)
+
+    # IHDR
+    ihdr_data = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
+    ihdr = make_chunk(b"IHDR", ihdr_data)
+
+    # IDAT — chaque ligne précédée du filtre 0
+    raw_rows = b""
+    for y in range(height):
+        row = pixels[y * width:(y + 1) * width]
+        # Grayscale → RGB
+        rgb_row = bytearray(width * 3)
+        for x in range(width):
+            v = row[x]
+            rgb_row[x * 3]     = v
+            rgb_row[x * 3 + 1] = v
+            rgb_row[x * 3 + 2] = v
+        raw_rows += b"\x00" + bytes(rgb_row)
+
+    compressed = zlib.compress(raw_rows, 9)
+    idat = make_chunk(b"IDAT", compressed)
+    iend = make_chunk(b"IEND", b"")
+
+    signature = b"\x89PNG\r\n\x1a\n"
+    return signature + ihdr + idat + iend
+
+
+@app.route("/api/map")
+def api_map():
+    """
+    Sert la carte LiDAR (ma_carte.pgm) convertie à la volée en PNG.
+    Paramètre optionnel : ?t=<timestamp> (cache-busting ignoré côté serveur).
+    """
+    if not os.path.isfile(MAP_FILE):
+        return jsonify({
+            "error": f"Carte introuvable : {MAP_FILE}",
+            "hint":  "Lance le nœud de cartographie ROS 2 puis sauvegarde la carte avec map_saver_cli."
+        }), 404
+    try:
+        png = _pgm_to_png_bytes(MAP_FILE)
+        return Response(png, mimetype="image/png",
+                        headers={"Cache-Control": "no-store"})
+    except Exception as e:
+        return jsonify({"error": f"Erreur lecture carte : {e}"}), 500
+
+
+@app.route("/api/map/info")
+def api_map_info():
+    """Retourne les métadonnées de la carte (taille, date de modification)."""
+    if not os.path.isfile(MAP_FILE):
+        return jsonify({"available": False}), 404
+    stat = os.stat(MAP_FILE)
+    return jsonify({
+        "available": True,
+        "size_bytes": stat.st_size,
+        "mtime": stat.st_mtime,
+        "path": MAP_FILE,
+    })
 
 
 # ═══════════════════════════════════════════════════
