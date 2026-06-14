@@ -14,6 +14,45 @@ HD = 0
 BD = 0 
 HG = 0
 BG = 0
+def lecturePiece(chemin_fichier):
+    try:
+        with open(chemin_fichier) as f:
+            for ligne in f :
+                ligne = ligne.strip()
+
+                if not ligne:
+                    continue
+                
+                #Utilisation la virgule pour terminer la ligne
+                partie = [p.strip() for p in ligne.split(",")]
+
+                if len(partie) != 5:
+                    print("Format d'objet invalide")
+                    return None
+
+                nom = partie[0]
+                largeur = int(partie[1])
+                longueur = int(partie[2])
+                x_HD = int(partie[3])
+                y_HD = int(partie[4])
+                
+                piece = {
+                    "nom" : nom,
+                    "dimensions" : (largeur, longueur),
+                    "positionCoinHautDroit" : (x_HD, y_HD),
+                    "obstacle" : []
+                }
+
+                print(f"Piece {nom} chargée")
+                return piece
+
+    except FileNotFoundError:
+        print("Piece introuvable : {chemin_fichier}")
+        return None
+
+    except ValueError:
+        print("Valeur invalide dans {chemin_fichier}")
+        return None
 
 def lectureObjet(chemin_fichier):
     try:

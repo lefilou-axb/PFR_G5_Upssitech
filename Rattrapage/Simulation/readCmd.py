@@ -21,29 +21,20 @@ Commmandes = os.path.join(Dossier_simulation, "..", "commands.txt")
 #########################
 #Initialisation des pieces & des obstacles
 
-balle_Green = {
-    "nom" : "obstacle1",
-    "type" : "cercle",
-    "positionCentre" : (0,0),
-    "dimension_Rayon_Cote" : 20,
-    "couleur" : 'green',
-    "epaisseur": 10
-}
+
 #########################
 
-piece = {
-    "nom": "piece1",
-    "dimensions": (400,400), #(Largeur,Longueur) de la piece
-    "positionCoinHautDroit": (200,200), #Position du coin haut droit (x_HD, y_HD)
-    "obstacle": [] #liste vide à renseigner plus tard
-}
+piece = table.lecturePiece(os.path.join(Dossier_simulation, "Piece_1.txt"))
 
-piece2 = {
-    "nom": "piece1",
-    "dimensions": (400,400), #(Largeur,Longueur) de la piece
-    "positionCoinHautDroit": (200,200), #Position du coin haut droit (x_HD, y_HD)
-    "obstacle": [balle_Green] #liste vide à renseigner plus tard
-}
+#Piece par defaut
+if piece is None:
+    print("Aucune pièce trouvée, pièce par défaut chargée")
+    piece = {
+        "nom"                  : "defaut",
+        "dimensions"           : (400, 400),
+        "positionCoinHautDroit": (200, 200),
+        "obstacle"             : []
+    }
 
 #Chargement des objets
 piece["obstacle"] = table.chargerObjet(Dossier_simulation)
