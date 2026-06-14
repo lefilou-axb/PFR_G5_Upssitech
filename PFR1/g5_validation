@@ -1,0 +1,770 @@
+Script started on 2026-01-26 10:50:44+01:00 [TERM="xterm-256color" TTY="/dev/pts/0" COLUMNS="153" LINES="33"]
+[?2004h]0;antonin@antonin-VirtualBox: ~/Documents/PFR[01;32mantonin@antonin-VirtualBox[00m:[01;34m~/Documents/PFR[00m$ maj[Kke
+[?2004lmake -C PFR_image
+make[1] : on entre dans le répertoire « /home/antonin/Documents/PFR/PFR_image »
+gcc -c image.c -o image.o -W -Wall -ansi -pedantic
+[01m[Kimage.c:[m[K In function ‘[01m[Kcharger_image[m[K’:
+[01m[Kimage.c:44:25:[m[K [01;35m[Kwarning: [m[KISO C90 does not support the ‘[01m[Khh[m[K’ gnu_scanf length modifier [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wformat=-Wformat=]8;;[m[K]
+   44 |         fscanf(fichier, [01;35m[K"%hhu"[m[K, &image->R[i]);
+      |                         [01;35m[K^~~~~~[m[K
+[01m[Kimage.c:48:25:[m[K [01;35m[Kwarning: [m[KISO C90 does not support the ‘[01m[Khh[m[K’ gnu_scanf length modifier [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wformat=-Wformat=]8;;[m[K]
+   48 |         fscanf(fichier, [01;35m[K"%hhu"[m[K, &image->G[i]);
+      |                         [01;35m[K^~~~~~[m[K
+[01m[Kimage.c:52:25:[m[K [01;35m[Kwarning: [m[KISO C90 does not support the ‘[01m[Khh[m[K’ gnu_scanf length modifier [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wformat=-Wformat=]8;;[m[K]
+   52 |         fscanf(fichier, [01;35m[K"%hhu"[m[K, &image->B[i]);
+      |                         [01;35m[K^~~~~~[m[K
+gcc -c module_test.c -o module_test.o -W -Wall -ansi -pedantic
+[01m[Kmodule_test.c:[m[K In function ‘[01m[Kquantification_IMG300[m[K’:
+[01m[Kmodule_test.c:32:9:[m[K [01;35m[Kwarning: [m[KISO C90 forbids mixed declarations and code [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wdeclaration-after-statement-Wdeclaration-after-statement]8;;[m[K]
+   32 |         [01;35m[Kconst[m[K char *fichier_entree  = path_entree;
+      |         [01;35m[K^~~~~[m[K
+[01m[Kmodule_test.c:41:9:[m[K [01;35m[Kwarning: [m[KISO C90 forbids mixed declarations and code [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wdeclaration-after-statement-Wdeclaration-after-statement]8;;[m[K]
+   41 |         [01;35m[Kunsigned[m[K int *image_quantifiee = quantifier_image(&image, nb_bits);
+      |         [01;35m[K^~~~~~~~[m[K
+[01m[Kmodule_test.c:[m[K In function ‘[01m[Ktxt_to_image[m[K’:
+[01m[Kmodule_test.c:85:9:[m[K [01;35m[Kwarning: [m[KISO C90 forbids mixed declarations and code [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wdeclaration-after-statement-Wdeclaration-after-statement]8;;[m[K]
+   85 |         [01;35m[Kconst[m[K char *fichier_entree  = path_entree;
+      |         [01;35m[K^~~~~[m[K
+[01m[Kmodule_test.c:101:17:[m[K [01;35m[Kwarning: [m[KISO C90 forbids mixed declarations and code [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wdeclaration-after-statement-Wdeclaration-after-statement]8;;[m[K]
+  101 |                 [01;35m[Kint[m[K r = (p >> (2*nb_bits)) & ((1<<nb_bits)-1);
+      |                 [01;35m[K^~~[m[K
+gcc -c main.c -o main.o -W -Wall -ansi -pedantic
+[01m[Kmain.c:[m[K In function ‘[01m[Kmain[m[K’:
+[01m[Kmain.c:14:25:[m[K [01;35m[Kwarning: [m[K"/*" within comment [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wcomment-Wcomment]8;;[m[K]
+   14 |     /*int num = 5389;   /*indice de la première image à quantifier (5389)*/
+      |                          
+[01m[Kmain.c:15:25:[m[K [01;35m[Kwarning: [m[K"/*" within comment [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wcomment-Wcomment]8;;[m[K]
+   15 |     /*int nb = 20;      /*nombre d'images à quantifier (20 dans le dossier fourni)*/
+      |                          
+[01m[Kmain.c:20:25:[m[K [01;35m[Kwarning: [m[K"/*" within comment [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wcomment-Wcomment]8;;[m[K]
+   20 |     /*int nb_bits = 2;  /*nombre de bits de quantification (1 à 8)*/
+      |                          
+[01m[Kmain.c:24:51:[m[K [01;35m[Kwarning: [m[K"/*" within comment [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wcomment-Wcomment]8;;[m[K]
+   24 |     /*quantification_IMG300(num, nb, nb_bits);    /**/
+      |                                                    
+[01m[Kmain.c:25:51:[m[K [01;35m[Kwarning: [m[K"/*" within comment [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wcomment-Wcomment]8;;[m[K]
+   25 |     /*txt_to_image(num, nb, nb_bits);             /**/
+      |                                                    
+gcc -o main.out image.o module_test.o main.o
+make[1] : on quitte le répertoire « /home/antonin/Documents/PFR/PFR_image »
+make -C text_engine
+make[1] : on entre dans le répertoire « /home/antonin/Documents/PFR/text_engine »
+gcc -Wall -Wextra -c main.c -I..
+gcc -Wall -Wextra -c config.c -I..
+gcc -Wall -Wextra -c lexer.c -I..
+gcc -Wall -Wextra -c interpreter.c -I..
+gcc -Wall -Wextra -c text_request.c -I..
+gcc main.o config.o lexer.o interpreter.o text_request.o ../lang.o -o pfr_text.out -I..
+make[1] : on quitte le répertoire « /home/antonin/Documents/PFR/text_engine »
+make -C IHM
+make[1] : on entre dans le répertoire « /home/antonin/Documents/PFR/IHM »
+gcc -Wall -Wextra -std=c99 -I.. -I../text_engine -I../PFR_image -c IHM_main.c -o IHM_main.o
+gcc -Wall -Wextra -std=c99 -I.. -I../text_engine -I../PFR_image -c IHM.c -o IHM.o
+gcc -Wall -Wextra -std=c99 -I.. -I../text_engine -I../PFR_image -c configuration.c -o configuration.o
+gcc -o IHM_main.out IHM_main.o IHM.o configuration.o ../lang.o ../text_engine/config.o ../text_engine/lexer.o ../text_engine/interpreter.o ../text_engine/text_request.o ../PFR_image/image.o ../PFR_image/module_test.o -Wall -Wextra -std=c99 -I.. -I../text_engine -I../PFR_image
+make[1] : on quitte le répertoire « /home/antonin/Documents/PFR/IHM »
+[?2004h]0;antonin@antonin-VirtualBox: ~/Documents/PFR[01;32mantonin@antonin-VirtualBox[00m:[01;34m~/Documents/PFR[00m$ cd IHM
+[?2004l[?2004h]0;antonin@antonin-VirtualBox: ~/Documents/PFR/IHM[01;32mantonin@antonin-VirtualBox[00m:[01;34m~/Documents/PFR/IHM[00m$ ./IHM_main.out
+[?2004l
+=============================================================
+        CHOISISSEZ VOTRE LANGUE | CHOOSE YOUR LANGUAGE
+=============================================================
+
+1.Français
+2.English
+> 1
+
+Langue chargée : Français
+
+
+========================================
+
+
+Bienvenue dans l'interface utilisateur du robot
+
+
+
+==================== ECRAN D'ACCUEIL ====================
+
+1.Utilisateur
+2.Administrateur
+3.Quitter
+> 4
+Erreur : veuillez saisir uniquement un nombre valide.
+> ertfdhtf
+Erreur : veuillez saisir uniquement un nombre valide.
+> 1
+
+
+==================== MENU UTILISATEUR ====================
+
+
+1.Pilotage du robot
+2.Traitement d'image
+3.Retour
+> 1
+
+ Veuillez choisir le numero de l'environnement :
+ > 1
+
+ Environnement selectionne :
+ 1
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 1
+
+
+==================== PILOTAGE VOCAL ====================
+
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.rear
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.center_lfe
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.side
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround71
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+Cannot connect to server socket err = No such file or directory
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.rear
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.center_lfe
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.side
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround71
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+Cannot connect to server socket err = No such file or directory
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+Réglage du bruit ambiant... (ne parlez pas 1 sec)
+Je vous écoute (Speak!)...
+Fin de l'écoute (End!)
+Je n'ai pas compris la phrase.
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 1
+
+
+==================== PILOTAGE VOCAL ====================
+
+ALSA lib pcm_dsnoop.c:567:(snd_pcm_dsnoop_open) unable to open slave
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.rear
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.center_lfe
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.side
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround71
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+Cannot connect to server socket err = No such file or directory
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+ALSA lib pcm_dsnoop.c:567:(snd_pcm_dsnoop_open) unable to open slave
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.rear
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.center_lfe
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.side
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround71
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+Cannot connect to server socket err = No such file or directory
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+Réglage du bruit ambiant... (ne parlez pas 1 sec)
+Je vous écoute (Speak!)...
+Fin de l'écoute (End!)
+Vous avez dit : 3 M
+Mots clés : ['3', 'M']
+Robot dit : Commande reçu: 3 M
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 1
+
+
+==================== PILOTAGE VOCAL ====================
+
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.rear
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.center_lfe
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.side
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround71
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+Cannot connect to server socket err = No such file or directory
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.rear
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.center_lfe
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.side
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround71
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+Cannot connect to server socket err = No such file or directory
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+Réglage du bruit ambiant... (ne parlez pas 1 sec)
+Je vous écoute (Speak!)...
+Fin de l'écoute (End!)
+Vous avez dit : avance de 3 mètres
+Mots clés : ['avance', 'de', '3', 'mètres']
+Robot dit : Commande reçu: avance de 3 mètres
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 1
+
+
+==================== PILOTAGE VOCAL ====================
+
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.rear
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.center_lfe
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.side
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround71
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+Cannot connect to server socket err = No such file or directory
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.rear
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.center_lfe
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.side
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround71
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib setup.c:547:(add_elem) Cannot obtain info for CTL elem (MIXER,'IEC958 Playback Default',0,0,0): No such file or directory
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+Cannot connect to server socket err = No such file or directory
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+Réglage du bruit ambiant... (ne parlez pas 1 sec)
+Je vous écoute (Speak!)...
+Fin de l'écoute (End!)
+Vous avez dit : avance de 2 m et tourner à droite
+Mots clés : ['avance', 'de', '2', 'm', 'et', 'tourner', 'à', 'droite']
+Robot dit : Commande reçu: avance de 2 m et tourner à droite
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 2
+
+
+==================== PILOTAGE TEXTUEL ====================
+
+
+Veuillez entrer une commande texte (1 pour quitter) :
+> avnce   ance s de " 3 2m
+
+Commandes générées :
+- forward 2.00
+
+Commandes exportées dans commands.txt.
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 2
+
+
+==================== PILOTAGE TEXTUEL ====================
+
+
+Veuillez entrer une commande texte (1 pour quitter) :
+> avance et tourne puis recule de Ém  2m
+
+Commandes générées :
+- forward 1.00
+- left 90.00
+- backward 2.00
+
+Commandes exportées dans commands.txt.
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 2
+
+
+==================== PILOTAGE TEXTUEL ====================
+
+
+Veuillez entrer une commande texte (1 pour quitter) :
+> recule  r   r 2 50    DE 50 PUIS TOURNE À G   droite de 63° et continue tout tout    droit et ne toru   ourne plus
+
+Commandes générées :
+- backward 50.00
+- right 63.00
+- forward 1.00
+
+Commandes exportées dans commands.txt.
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 2
+
+
+==================== PILOTAGE TEXTUEL ====================
+
+
+Veuillez entrer une commande texte (1 pour quitter) :
+> avance en zigazg    zag   gzag
+
+Commandes générées :
+- forward 1.00
+- left 45.00
+- forward 1.00
+- right 45.00
+
+Commandes exportées dans commands.txt.
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 2
+
+
+==================== PILOTAGE TEXTUEL ====================
+
+
+Veuillez entrer une commande texte (1 pour quitter) :
+> fais un cr ecrle
+
+Commande saisie non reconnue par le système
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 2
+
+
+==================== PILOTAGE TEXTUEL ====================
+
+
+Veuillez entrer une commande texte (1 pour quitter) :
+> fais un cercle
+
+Commandes générées :
+- forward 0.50
+- left 45.00
+- forward 0.50
+- left 45.00
+- forward 0.50
+- left 45.00
+- forward 0.50
+- left 45.00
+- forward 0.50
+- left 45.00
+- forward 0.50
+- left 45.00
+- forward 0.50
+- left 45.00
+- forward 0.50
+- left 45.00
+
+Commandes exportées dans commands.txt.
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 2
+
+
+==================== PILOTAGE TEXTUEL ====================
+
+
+Veuillez entrer une commande texte (1 pour quitter) :
+> a va jusquè ,'  'à la balle verte
+
+Commandes générées :
+- goto BALL_GREEN
+
+Commandes exportées dans commands.txt.
+Pas de valeur pour la commande : goto
+
+
+==================== PILOTAGE ====================
+
+ 
+1.Mode vocal
+2.Mode textuel
+3.Retour
+> 3
+
+
+==================== MENU UTILISATEUR ====================
+
+
+1.Pilotage du robot
+2.Traitement d'image
+3.Retour
+> 2
+
+
+==================== TRAITEMENT D'IMAGE ====================
+
+
+Lancement du programme de traitement d'image...
+
+Valeur de la quantification :
+> 4
+
+Fin du traitement des images.
+
+
+==================== MENU UTILISATEUR ====================
+
+
+1.Pilotage du robot
+2.Traitement d'image
+3.Retour
+> 3
+
+
+==================== ECRAN D'ACCUEIL ====================
+
+1.Utilisateur
+2.Administrateur
+3.Quitter
+> 2
+
+
+==================== CONNEXION ADMINISTRATEUR ====================
+
+Identifiant :
+> segrdf
+Mot de passe :
+> gdfgdcf
+Identifiant ou mot de passe incorrect.
+
+
+==================== CONNEXION ADMINISTRATEUR ====================
+
+Identifiant :
+> gdfg
+Mot de passe :
+> gsd
+Identifiant ou mot de passe incorrect.
+
+
+==================== CONNEXION ADMINISTRATEUR ====================
+
+Identifiant :
+> hf
+Mot de passe :
+> gfd
+Identifiant ou mot de passe incorrect.
+
+========================================
+
+Nombre maximum de tentatives atteint
+
+Nouvelle tentative possible dans
+ 30 secondes  29 secondes  28 secondes  27 secondes  26 secondes  25 secondes  24 secondes  23 secondes  22 secondes  21 secondes  20 secondes  19 secondes  18 secondes  17 secondes  16 secondes  15 secondes  14 secondes  13 secondes  12 secondes  11 secondes  10 secondes  9 secondes  8 secondes  7 secondes  6 secondes  5 secondes  4 secondes  3 secondes  2 secondes  1 secondes 
+
+
+==================== ECRAN D'ACCUEIL ====================
+
+1.Utilisateur
+2.Administrateur
+3.Quitter
+> 2
+
+
+==================== CONNEXION ADMINISTRATEUR ====================
+
+Identifiant :
+> admin
+Mot de passe :
+> robot
+
+
+==================== MENU ADMINISTRATEUR ====================
+
+
+1.Configuration traitement d'image
+2.Retour
+> 1
+
+
+==================== CONFIGURATION TRAITEMENT D'IMAGE ====================
+
+1.Modifier la valeur
+2.Retour
+> 1
+Configuration actuelle :
+  bit  = 2
+  min  = 1
+  max  = 8
+  mod  = 4
+Nouvelle valeur modifiee :
+> 2
+Configuration mise à jour avec succès
+
+
+==================== MENU ADMINISTRATEUR ====================
+
+
+1.Configuration traitement d'image
+2.Retour
+> Erreur : veuillez saisir uniquement un nombre valide.
+> 2
+2
+
+
+==================== ECRAN D'ACCUEIL ====================
+
+1.Utilisateur
+2.Administrateur
+3.Quitter
+> 1
+
+
+==================== MENU UTILISATEUR ====================
+
+
+1.Pilotage du robot
+2.Traitement d'image
+3.Retour
+> 2
+
+
+==================== TRAITEMENT D'IMAGE ====================
+
+
+Lancement du programme de traitement d'image...
+
+Valeur de la quantification :
+> 2
+
+Fin du traitement des images.
+
+
+==================== MENU UTILISATEUR ====================
+
+
+1.Pilotage du robot
+2.Traitement d'image
+3.Retour
+> 3
+
+
+==================== ECRAN D'ACCUEIL ====================
+
+1.Utilisateur
+2.Administrateur
+3.Quitter
+> 3
+
+========================================
+
+Fermeture de l'interface...
+[?2004h]0;antonin@antonin-VirtualBox: ~/Documents/PFR/IHM[01;32mantonin@antonin-VirtualBox[00m:[01;34m~/Documents/PFR/IHM[00m$ ./IHM_main.out
+[?2004l
+=============================================================
+        CHOISISSEZ VOTRE LANGUE | CHOOSE YOUR LANGUAGE
+=============================================================
+
+1.Français
+2.English
+> 2
+
+Loaded language : English
+
+
+========================================
+
+
+Welcome to the robot user interface
+
+
+
+==================== HOME ====================
+
+1.User
+2.Administrator
+3.Quit
+> 1
+
+
+==================== USER MENU ====================
+
+
+1.Robot control
+2.Image processing
+3.Back
+> 1
+
+Please choose the environment number :
+ > 1
+
+Selected environment :
+ 1
+
+
+==================== PILOTING ====================
+
+ 
+1.Voice mode
+2.Text mode
+3.Back
+> 2
+
+
+==================== TEXTUAL CONTROL ====================
+
+
+Please enter a text command (1 to quit):
+> forward 2m
+
+Commands generated :
+- forward 2.00
+
+Commands exported to commands.txt.
+
+
+==================== PILOTING ====================
+
+ 
+1.Voice mode
+2.Text mode
+3.Back
+> 3
+
+
+==================== USER MENU ====================
+
+
+1.Robot control
+2.Image processing
+3.Back
+> 3
+
+
+==================== HOME ====================
+
+1.User
+2.Administrator
+3.Quit
+> 3
+
+========================================
+
+Closing the interface...
+[?2004h]0;antonin@antonin-VirtualBox: ~/Documents/PFR/IHM[01;32mantonin@antonin-VirtualBox[00m:[01;34m~/Documents/PFR/IHM[00m$ exit
+[?2004lexit
+
+Script done on 2026-01-26 11:25:00+01:00 [COMMAND_EXIT_CODE="0"]
