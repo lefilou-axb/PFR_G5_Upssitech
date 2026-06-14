@@ -7,20 +7,84 @@
 
 # bibliothèque
 import turtle as t
+import os
+import glob
+
+HD = 0
+BD = 0 
+HG = 0
+BG = 0
+
+def lectureObjet(chemin_fichier):
+    try:
+        with open(chemin_fichier) as f:
+            for ligne in f:
+                ligne = ligne.strip()
+
+                if not ligne:
+                    continue
+                
+                #Utilisation la virgule pour terminer la ligne
+                partie = [p.strip() for p in ligne.split(",")]
+
+                if len(partie) != 5:
+                    print("Format d'objet invalide")
+                    return None
+                
+                couleur = partie[0]
+                position = (int(partie[1]), int(partie[2]))
+                forme = partie[3]
+                dimension = partie[4]
+
+                fichierObjet = os.path.basename(chemin_fichier)
+                nom_objet = fichierObjet.replace(".txt", "").replace("_", "").lower()
+                
+                obstacle = {
+                    "nom" : nom_objet,
+                    "type" : forme,
+                    "positionCentre" : position,
+                    "dimension_Rayon_Cote" : int(dimension),
+                    "couleur" : couleur,
+                    "epaisseur" : 10
+                }
+
+                print(f"Objet {nom_objet} chargé")
+                return obstacle
+
+    except FileNotFoundError:
+        print(f"Fichier introuvable : {chemin_fichier}")
+        return None
+    
+    except ValueError:
+        print(f"Valeur invalide dans {chemin_fichier} : {ValueError}")
+        return None
+
+def chargerObjet(dossier="."):
+    obstacles = []
+
+    #Chargement des fichiers
+    pattern = os.path.join(dossier, "Objet_*.txt")
+    fichiers = sorted(glob.glob(pattern))
+
+    if not fichiers:
+        print(f"Aucun fichier Objet_*.txt trouvé dans : {dossier}")
+        return obstacles
+    
+    print(f"{len(fichiers)} fichier objet trouvé :")
+    for chemin in fichiers:
+        obstacle = lectureObjet(chemin)
+        if obstacle is not None:
+            obstacles.append(obstacle)
+    
+    print(f"{len(obstacles)} objet(s) chargé(s).")
+    return obstacles
 
 def tracerPiece(la_piece):
-    #Test pour savoir si la piece est carré ou non
-    #if la_piece["dimensions"][0] == la_piece["dimensions"][1]: #Test sur la valeur du constituant
-        #print("Piece carré de dimension : ", la_piece["dimensions"][0])
-    #else :
-        #print("Piece non carré, largeur = ", la_piece["dimensions"][0], " et longueur = ", la_piece["dimensions"][1])
+    global HD, BD, HG, BG
 
+    #Angle de rotation
+    angle = 90
 
-    #Initialisation de la position des coins de la piece
-    global HD
-    global BD
-    global HG
-    global BG
     HD = la_piece["positionCoinHautDroit"]
     BD = [la_piece["positionCoinHautDroit"][0], la_piece["positionCoinHautDroit"][1]-la_piece["dimensions"][1]]
     BG = [la_piece["positionCoinHautDroit"][0]-la_piece["dimensions"][0], la_piece["positionCoinHautDroit"][1]-la_piece["dimensions"][1]]
@@ -28,13 +92,7 @@ def tracerPiece(la_piece):
 
     #Initialisation de la variable contenant les coins de la piece
     coin_piece = [HD, BD, BG, HG]   
-
     #print(coin_piece) #Affichage de la position des coins    
-
-
-    # Prise en compte d'une pièce
-    #Angle de rotation
-    angle = 90
 
     # néttoyage de la table traçante
     t.clearscreen()
@@ -42,15 +100,8 @@ def tracerPiece(la_piece):
     # Stylet en position haute - pas de traçage
     t.up()
 
-    # position du coin Haut Droit
-    # Dans le dictionnaire
-
     # déplacement au coin Haut Droit 
     t.goto(coin_piece[0])
-
-
-    # Dimensions de la pièce carrée
-    # Dans le dictionnaire
 
     # Données pour le traçage
     t.width(5)                  # largeur du trait
@@ -72,6 +123,7 @@ def tracerPiece(la_piece):
 
 def ajouter_obstacle(obstacle,piece):
     obstaclePossible = True #Possibilité de positionner l'obstacle
+
     #Test pour savoir si on peut poser l'obstacle
     if obstacle["positionCentre"][0]+obstacle["dimension_Rayon_Cote"]+5 > HD[0] or obstacle["positionCentre"][1]+5 > HD[1] :
         obstaclePossible = False
@@ -116,8 +168,8 @@ def ajouter_obstacle(obstacle,piece):
             t.end_fill()
                   
         t.up()                         # retour en position haute
-        #print("Obstacle tracé en : ", obstacle["positionCentre"])
-        piece["obstacle"].append(obstacle)
+        print(f"Obstacle tracé en {obstacle['positionCentre']}")
+        #piece["obstacle"].append(obstacle)
     
 
 #def tracer_obstacles_piece(piece):

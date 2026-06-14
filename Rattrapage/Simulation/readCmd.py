@@ -11,12 +11,15 @@
 #Bibiliothèques
 import turtle as t
 import table
+import os
 
+#PATH
+Dossier_simulation = os.path.dirname(os.path.abspath(__file__))
+
+Commmandes = os.path.join(Dossier_simulation, "..", "commands.txt")
+
+#########################
 #Initialisation des pieces & des obstacles
-HD = 0
-HG = 0
-BD = 0
-BG = 0
 
 balle_Green = {
     "nom" : "obstacle1",
@@ -26,8 +29,9 @@ balle_Green = {
     "couleur" : 'green',
     "epaisseur": 10
 }
+#########################
 
-piece1 = {
+piece = {
     "nom": "piece1",
     "dimensions": (400,400), #(Largeur,Longueur) de la piece
     "positionCoinHautDroit": (200,200), #Position du coin haut droit (x_HD, y_HD)
@@ -41,6 +45,8 @@ piece2 = {
     "obstacle": [balle_Green] #liste vide à renseigner plus tard
 }
 
+#Chargement des objets
+piece["obstacle"] = table.chargerObjet(Dossier_simulation)
 
 
 # Initialisation de la liste qui va contenir les commandes du fichier
@@ -48,14 +54,14 @@ cmd_list = []
 depart = (50,50)
 
 # Lecture du fichier et remplissage de la liste des commandes
-with open("../IHM/commands.txt","r") as file:
+with open("C:/Users/lucas/OneDrive/Documents/etudes/Upssitech/PFR/PFR_G5_Upssitech/Rattrapage/IHM/commands.txt","r") as file:
     for ligne in file:
         ligne = ligne.strip()
         #print(ligne)
         cmd_list.append(ligne)
 #print(cmd_list)
 
-table.tracerPiece(piece2)
+table.tracerPiece(piece)
 
 # Déplacement du robot
 #Initialisation des déplacements
