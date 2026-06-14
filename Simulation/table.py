@@ -1,6 +1,9 @@
 # bibliothèque
 import turtle as t
 
+screen = t.Screen()
+canvas = screen.getcanvas()
+
 def tracerPiece(la_piece):
     #Test pour savoir si la piece est carré ou non
     #if la_piece["dimensions"][0] == la_piece["dimensions"][1]: #Test sur la valeur du constituant
@@ -112,6 +115,18 @@ def ajouter_obstacle(obstacle,piece):
         #print("Obstacle tracé en : ", obstacle["positionCentre"])
         piece["obstacle"].append(obstacle)
     
+def couleur_pixel(x, y):
+    # conversion coordonnées turtle → canvas
+    cx = int(canvas.winfo_width() / 2 + x)
+    cy = int(canvas.winfo_height() / 2 - y)
+
+    try:
+        pixel = canvas.winfo_rgb(canvas.itemcget(
+            canvas.find_closest(cx, cy)[0], "fill"
+        ))
+        return pixel
+    except:
+        return (65535, 65535, 65535)  # blanc
 
 #def tracer_obstacles_piece(piece):
     #for i in range(len(piece["obstacle"])):

@@ -1,0 +1,3 @@
+forward 70
+right
+forward 100

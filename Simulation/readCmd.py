@@ -66,6 +66,12 @@ for i in range(len(cmd_list)):
         print(f"Pas de valeur pour la commande : {commande}")
     
     if(commande == "forward"):
+        #position = t.pos()
+        #x = position[0]
+        #y = position[1]
+        #print("Position du robot : ", x, ",", y)
+        #print(couleur_pixel(x,y))
+        #if(couleur_pixel(x, y))
         t.forward(valeur)
     
     if((commande == "turn") or (commande == "left")):
@@ -88,5 +94,4 @@ for i in range(len(cmd_list)):
     
 t.up()
 t.done()
-
 
