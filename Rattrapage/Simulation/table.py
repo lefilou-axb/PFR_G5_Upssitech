@@ -9,6 +9,7 @@
 import turtle as t
 import os
 import glob
+import math
 
 HD = 0
 BD = 0 
@@ -210,7 +211,27 @@ def ajouter_obstacle(obstacle,piece):
         print(f"Obstacle tracé en {obstacle['positionCentre']}")
         #piece["obstacle"].append(obstacle)
     
+def obstacle_devant(x, y, angle, obstacles, distance=10):
 
-#def tracer_obstacles_piece(piece):
-    #for i in range(len(piece["obstacle"])):
-        #print(piece["obstacle"][i]["nom"])
+    #Distance à 10pixels devant le robot selon son angle
+    xdevant = x + distance * math.cos(math.radians(angle))
+    ydevant = y + distance * math.sin(math.radians(angle))
+
+    for obstacle in obstacles:
+        objet_x = obstacle["positionCentre"][0]
+        objet_y = obstacle["positionCentre"][1]
+        dimension_objet = obstacle["dimension_Rayon_Cote"]
+
+        if obstacle["type"] == "cercle":
+            distance_cercle = math.sqrt((xdevant - objet_x)**2 + (ydevant - objet_y)**2)
+            if distance_cercle <= dimension_objet:
+                print(f"Obstacle '{obstacle['nom']}' détecté.")
+                return True
+
+        if obstacle["type"] == "carre":
+            # Vérifier si le point est dans le carré
+            if objet_x <= xdevant <= objet_x + dimension_objet and objet_y <= ydevant <= objet_y + dimension_objet:
+                print(f"Obstacle '{obstacle['nom']}' détecté.")
+                return True
+
+    return False

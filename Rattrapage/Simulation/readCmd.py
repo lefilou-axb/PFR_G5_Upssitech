@@ -76,7 +76,10 @@ for i in range(len(cmd_list)):
     
     # Tests pour effectuer les déplacements
     if(commande == "forward"):
-        t.forward(valeur*100)
+        if not table.obstacle_devant(t.xcor(), t.ycor(), t.heading(), piece["obstacle"]):
+            t.forward(valeur * 100)
+    else:
+        print("Déplacement bloqué")
     
     if((commande == "turn") or (commande == "left")):
         if(valeur > 0):
@@ -91,7 +94,10 @@ for i in range(len(cmd_list)):
             t.right(90)
 
     if(commande == "backward"):
-        t.backward(valeur)
+        if not table.obstacle_devant(t.xcor(), t.ycor(), t.heading() + 180, piece["obstacle"]):
+            t.forward(valeur * 100)
+    else:
+        print("Déplacement bloqué")
     
     if(commande == "goto"):
         t.goto(valeur)
