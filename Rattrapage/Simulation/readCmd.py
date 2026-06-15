@@ -19,7 +19,7 @@ Dossier_simulation = os.path.dirname(os.path.abspath(__file__))
 Commmandes = os.path.join(Dossier_simulation, "..", "commands.txt")
 
 
-piece = table.lecturePiece(os.path.join(Dossier_simulation, "Piece_1.txt"))
+piece = table.lecturePiece(os.path.join(Dossier_simulation, "Piece_5.txt"))
 #print(f"Piece chargée : {piece}")
 
 #Piece par defaut
