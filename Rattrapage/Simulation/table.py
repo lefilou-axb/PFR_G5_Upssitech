@@ -27,9 +27,19 @@ def lecturePiece(chemin_fichier):
                 #Utilisation la virgule pour terminer la ligne
                 partie = [p.strip() for p in ligne.split(",")]
 
-                if len(partie) != 5:
+                if len(partie) < 5:
                     print("Format d'objet invalide")
                     return None
+
+                obstacles = []
+                noms_objets = partie[5:]
+
+                #Chargement des objets
+                for nom_objet in noms_objets:
+                    chemin_objet = os.path.join(os.path.dirname(chemin_fichier), nom_objet.strip() + ".txt")
+                    obstacle = lectureObjet(chemin_objet)
+                    if obstacle is not None:
+                        obstacles.append(obstacle)
 
                 nom = partie[0]
                 largeur = int(partie[1])
@@ -41,7 +51,7 @@ def lecturePiece(chemin_fichier):
                     "nom" : nom,
                     "dimensions" : (largeur, longueur),
                     "positionCoinHautDroit" : (x_HD, y_HD),
-                    "obstacle" : []
+                    "obstacle" : obstacles
                 }
 
                 print(f"Piece {nom} chargée")
@@ -120,6 +130,7 @@ def chargerObjet(dossier="."):
     return obstacles
 
 def tracerPiece(la_piece):
+    print(f"Obstacles à tracer : {len(la_piece['obstacle'])}")
     global HD, BD, HG, BG
 
     #Angle de rotation

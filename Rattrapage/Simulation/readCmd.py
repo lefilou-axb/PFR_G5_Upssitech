@@ -20,6 +20,7 @@ Commmandes = os.path.join(Dossier_simulation, "..", "commands.txt")
 
 
 piece = table.lecturePiece(os.path.join(Dossier_simulation, "Piece_1.txt"))
+#print(f"Piece chargée : {piece}")
 
 #Piece par defaut
 if piece is None:
@@ -32,8 +33,7 @@ if piece is None:
     }
 
 #Chargement des objets
-piece["obstacle"] = table.chargerObjet(Dossier_simulation)
-
+#piece["obstacle"] = table.chargerObjet(Dossier_simulation)
 
 # Initialisation de la liste qui va contenir les commandes du fichier
 cmd_list = []
