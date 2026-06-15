@@ -54,55 +54,70 @@ with open("C:/Users/lucas/OneDrive/Documents/etudes/Upssitech/PFR/PFR_G5_Upssite
 
 table.tracerPiece(piece)
 
-# Déplacement du robot
-#Initialisation des déplacements
-t.goto(depart)
-t.width(2)
-t.color('red')
-t.down()
-t.speed(1)
-for i in range(len(cmd_list)):
-    valeur = 0
-    try :
-        instruction = cmd_list[i].split()
-    except :
-        print("Commmande inconnue\n")
+while True:
+    # Déplacement du robot et choix du mode
+    #Initialisation des déplacements
+    t.goto(depart)
+    t.width(2)
+    t.up()
 
-    commande = instruction[0]
-    try :
-        valeur = float(instruction[1])
-    except :
-        print(f"Pas de valeur pour la commande : {commande}")
-    
-    # Tests pour effectuer les déplacements
-    if(commande == "forward"):
-        if not table.obstacle_devant(t.xcor(), t.ycor(), t.heading(), piece["obstacle"]):
-            t.forward(valeur * 100)
-    else:
-        print("Déplacement bloqué")
-    
-    if((commande == "turn") or (commande == "left")):
-        if(valeur > 0):
-            t.left(valeur)
-        else :
-            t.left(90)
+    print("Mode de déplacement :")
+    print("1 - Fichier de commandes")
+    print("2 - Mode automatique")
+    print("3 - Quitter")
+    mode = input("Choix : ")
 
-    if(commande == "right"):
-        if(valeur > 0):
-            t.right(valeur)
-        else :
-            t.right(90)
+    if mode == "1": 
+        t.color('red')
+        t.down()
+        t.speed(1)
 
-    if(commande == "backward"):
-        if not table.obstacle_devant(t.xcor(), t.ycor(), t.heading() + 180, piece["obstacle"]):
-            t.forward(valeur * 100)
-    else:
-        print("Déplacement bloqué")
-    
-    if(commande == "goto"):
-        t.goto(valeur)
-    
-t.up()
+        for i in range(len(cmd_list)):
+            valeur = 0
+            try :
+                instruction = cmd_list[i].split()
+            except :
+                print("Commmande inconnue\n")
+
+            commande = instruction[0]
+            try :
+                valeur = float(instruction[1])
+            except :
+                print(f"Pas de valeur pour la commande : {commande}")
+            
+            # Tests pour effectuer les déplacements
+            if(commande == "forward"):
+                if not table.obstacle_devant(t.xcor(), t.ycor(), t.heading(), piece["obstacle"]):
+                    t.forward(valeur * 100)
+            else:
+                print("Déplacement bloqué")
+            
+            if((commande == "turn") or (commande == "left")):
+                if(valeur > 0):
+                    t.left(valeur)
+                else :
+                    t.left(90)
+
+            if(commande == "right"):
+                if(valeur > 0):
+                    t.right(valeur)
+                else :
+                    t.right(90)
+
+            if(commande == "backward"):
+                if not table.obstacle_devant(t.xcor(), t.ycor(), t.heading() + 180, piece["obstacle"]):
+                    t.forward(valeur * 100)
+            else:
+                print("Déplacement bloqué")
+            
+            if(commande == "goto"):
+                t.goto(valeur)
+            
+    elif mode == "2":
+        table.deplacement_automatique(piece["obstacle"], piece)
+    elif mode == "3":
+        print("Fin du programme.")
+        break
+
 t.done()
-
 
