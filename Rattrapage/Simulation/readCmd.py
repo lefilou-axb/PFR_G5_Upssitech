@@ -18,11 +18,6 @@ Dossier_simulation = os.path.dirname(os.path.abspath(__file__))
 
 Commmandes = os.path.join(Dossier_simulation, "..", "commands.txt")
 
-#########################
-#Initialisation des pieces & des obstacles
-
-
-#########################
 
 piece = table.lecturePiece(os.path.join(Dossier_simulation, "Piece_1.txt"))
 
@@ -53,11 +48,12 @@ with open("C:/Users/lucas/OneDrive/Documents/etudes/Upssitech/PFR/PFR_G5_Upssite
 #print(cmd_list)
 
 table.tracerPiece(piece)
+t.goto(depart)
 
 while True:
     # Déplacement du robot et choix du mode
     #Initialisation des déplacements
-    t.goto(depart)
+    #t.goto(depart) #Fais revenir le robot à sa position de départ
     t.width(2)
     t.up()
 
@@ -87,10 +83,13 @@ while True:
             
             # Tests pour effectuer les déplacements
             if(commande == "forward"):
-                if not table.obstacle_devant(t.xcor(), t.ycor(), t.heading(), piece["obstacle"]):
-                    t.forward(valeur * 100)
-            else:
-                print("Déplacement bloqué")
+                distance_totale = int(valeur * 100)
+                pas = 10
+                for _ in range(0, distance_totale, pas):
+                    if not table.detection_mur(t.xcor(), t.ycor(), t.heading(), piece) and not table.obstacle_devant(t.xcor(), t.ycor(), t.heading(), piece["obstacle"]):
+                        t.forward(pas)
+                    else:
+                        print("Déplacement bloqué ")
             
             if((commande == "turn") or (commande == "left")):
                 if(valeur > 0):
@@ -105,10 +104,10 @@ while True:
                     t.right(90)
 
             if(commande == "backward"):
-                if not table.obstacle_devant(t.xcor(), t.ycor(), t.heading() + 180, piece["obstacle"]):
+                if not table.detection_mur(t.xcor(), t.ycor(), t.heading(), piece) and not table.obstacle_devant(t.xcor(), t.ycor(), t.heading() + 100, piece["obstacle"]):
                     t.forward(valeur * 100)
-            else:
-                print("Déplacement bloqué")
+                else:
+                    print("Déplacement bloqué ")
             
             if(commande == "goto"):
                 t.goto(valeur)

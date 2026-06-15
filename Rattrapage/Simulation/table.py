@@ -211,7 +211,7 @@ def ajouter_obstacle(obstacle,piece):
         print(f"Obstacle tracé en {obstacle['positionCentre']}")
         #piece["obstacle"].append(obstacle)
     
-def obstacle_devant(x, y, angle, obstacles, distance=10):
+def obstacle_devant(x, y, angle, obstacles, distance=15):
 
     #Distance à 10pixels devant le robot selon son angle
     xdevant = x + distance * math.cos(math.radians(angle))
@@ -236,37 +236,33 @@ def obstacle_devant(x, y, angle, obstacles, distance=10):
 
     return False
 
+def detection_mur(x, y, angle, piece, distance=15):
+    xdevant = x + distance * math.cos(math.radians(angle))
+    ydevant = y + distance * math.sin(math.radians(angle))
+
+    x_HD = piece["positionCoinHautDroit"][0]
+    y_HD = piece["positionCoinHautDroit"][1]
+    x_BG = x_HD - piece["dimensions"][0]
+    y_BG = y_HD - piece["dimensions"][1]
+
+    return (xdevant > x_HD - 5 or xdevant < x_BG + 5 or ydevant > y_HD - 5 or ydevant < y_BG + 5)
+
 def deplacement_automatique(obstacles, piece):
     t.speed(2)
     t.color('red')
-    t.down
+    #t.down() #Traçé du chemin
 
     #Condition d'arrêt de boucle infini
     deplacement = 0
-    deplacement_max = 1000
+    deplacement_max = 500
 
     while deplacement < deplacement_max:
-        if not obstacle_devant(t.xcor(), t.ycor(), t.heading(), obstacles):
-            x_HD = piece["positionCoinHautDroit"][0]
-            y_HD = piece["positionCoinHautDroit"][0]
-            x_BG = x_HD - piece["dimensions"][0]
-            y_BG = y_HD - piece["dimensions"][1]
-
-            #Distance à 10pixels devant le robot selon son angle
-            xdevant = t.xcor() + 10 * math.cos(math.radians(t.heading()))
-            ydevant = t.ycor() + 10 * math.sin(math.radians(t.heading()))
-
-            # Vérifier si on sort de la pièce
-            if xdevant > x_HD - 5 or xdevant < x_BG + 5 or \
-               ydevant > y_HD - 5 or ydevant < y_BG + 5:
-                print("Mur détecté")
-                t.right(90)
-            else:
-                t.forward(10)
-        else:
+        if not obstacle_devant(t.xcor(), t.ycor(), t.heading(), obstacles,) and not detection_mur(t.xcor(), t.ycor(), t.heading(), piece):
+            t.forward(10)
+        else : 
             print("Obstacle détecté")
             t.right(90)
-
+    
         deplacement += 1
             
 
